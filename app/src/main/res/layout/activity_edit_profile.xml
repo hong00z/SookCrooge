@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EditProfile">
+    <TextView
+        android:id="@+id/edit_name"
+        android:layout_width="85dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
+        android:layout_marginEnd="25dp"
+        android:gravity="center"
+        android:text="이름"
+        app:layout_constraintEnd_toStartOf="@+id/edit_input_name"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/edit_input_name"
+        android:layout_width="230dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="108dp"
+        android:layout_marginEnd="50dp"
+        android:hint="ex. 홍길동"
+        android:inputType="text"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/edit_text_nickname"
+        android:layout_width="85dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="51dp"
+        android:layout_marginEnd="25dp"
+        android:gravity="center"
+        android:text="닉네임"
+        app:layout_constraintEnd_toStartOf="@+id/edit_input_nickname"
+        app:layout_constraintTop_toBottomOf="@+id/edit_name" />
+
+    <EditText
+        android:id="@+id/edit_input_nickname"
+        android:layout_width="230dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="50dp"
+        android:hint="ex. 숙크루지"
+        android:inputType="text"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_input_name" />
+
+    <TextView
+        android:id="@+id/edit_warning_nickname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="120dp"
+        android:text="이미 사용중인 닉네임입니다."
+        android:visibility="invisible"
+        android:textColor="#EE0000"
+        android:textSize="11sp"
+        app:layout_constraintStart_toStartOf="@+id/edit_text_nickname"
+        app:layout_constraintTop_toBottomOf="@+id/edit_input_nickname" />
+
+    <TextView
+        android:id="@+id/edit_text_email"
+        android:layout_width="85dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="52dp"
+        android:layout_marginEnd="25dp"
+        android:gravity="center"
+        android:text="이메일"
+        app:layout_constraintEnd_toStartOf="@+id/edit_input_email"
+        app:layout_constraintTop_toBottomOf="@+id/edit_text_nickname" />
+
+    <EditText
+        android:id="@+id/edit_input_email"
+        android:layout_width="230dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="50dp"
+        android:hint="ex. sookcrooge@naver.com"
+        android:inputType="text"
+        android:enabled="false"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_input_nickname" />
+
+    <TextView
+        android:id="@+id/edit_text_password"
+        android:layout_width="85dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="52dp"
+        android:layout_marginEnd="25dp"
+        android:gravity="center"
+        android:text="비밀번호"
+
+        app:layout_constraintEnd_toStartOf="@+id/edit_input_password"
+        app:layout_constraintTop_toBottomOf="@+id/edit_text_email" />
+
+    <EditText
+        android:id="@+id/edit_input_password"
+        android:layout_width="230dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="50dp"
+        android:hint="영문, 숫자 포함 8자리 이상"
+        android:inputType="text"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_input_email" />
+
+    <TextView
+        android:id="@+id/edit_warning_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="120dp"
+        android:text="비밀번호가 일치하지 않습니다."
+        android:textColor="#EE0000"
+        android:textSize="11sp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="@+id/edit_text_password"
+        app:layout_constraintTop_toBottomOf="@+id/edit_input_password" />
+
+    <Button
+        android:id="@+id/editProfileButton"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="50dp"
+        android:backgroundTint="#a3cca2"
+        android:text="정보수정"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_warning_password" />
+
+    <Button
+        android:id="@+id/deleteAccountButton"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:backgroundTint="#4d4d4d"
+        android:text="회원탈퇴"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editProfileButton" />
+</androidx.constraintlayout.widget.ConstraintLayout>
