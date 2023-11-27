@@ -4,6 +4,7 @@ import android.app.ProgressDialog.show
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import com.example.sookcrooge.databinding.ActivityEditProfileBinding
 import com.example.sookcrooge.databinding.DeleteAccountDialogBinding
@@ -20,12 +21,15 @@ class EditProfile : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         binding.editProfileButton.setOnClickListener{
             if (isAllConditionQualified())
             {
                 name = binding.editInputName.text.toString()
                 //추후 구현: 바뀐 데이터값을 DB에 저장
+                finish()
             }
 
         }
@@ -59,5 +63,15 @@ class EditProfile : AppCompatActivity() {
         //추후 구현: password가 일치하는지 확인하고 아니라면 해당 오류 메시지 띄우기
 
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

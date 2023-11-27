@@ -3,6 +3,7 @@ package com.example.sookcrooge
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.sookcrooge.databinding.ActivityResetPasswordBinding
@@ -22,6 +23,8 @@ class ResetPassword : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         binding.resetPWDNumberConfirmButton.setOnClickListener{
 
@@ -101,6 +104,7 @@ class ResetPassword : AppCompatActivity() {
             }
 
             //추후 구현: 모든 조건 충족되면 바뀐 비밀번호 저장 후 로그인 화면으로 돌아가기.
+            finish()
         }
 
 
@@ -190,5 +194,15 @@ class ResetPassword : AppCompatActivity() {
             }
         }
         timer.schedule(timerTask, 0, 1000)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

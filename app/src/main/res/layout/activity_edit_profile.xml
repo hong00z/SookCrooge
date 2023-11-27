@@ -4,7 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".EditProfile">
+    tools:context=".EditProfile"
+    android:background="@color/white"
+    >
+    <com.google.android.material.appbar.AppBarLayout
+        style="@style/Widget.MaterialComponents.Toolbar.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="정보 수정"/>
+    </com.google.android.material.appbar.AppBarLayout>
     <TextView
         android:id="@+id/edit_name"
         android:layout_width="85dp"
@@ -14,7 +30,9 @@
         android:gravity="center"
         android:text="이름"
         app:layout_constraintEnd_toStartOf="@+id/edit_input_name"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/black"
+        />
 
     <EditText
         android:id="@+id/edit_input_name"
@@ -22,8 +40,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="108dp"
         android:layout_marginEnd="50dp"
+        android:backgroundTint="@color/black"
         android:hint="ex. 홍길동"
         android:inputType="text"
+        android:textColor="@color/black"
+        android:textColorHint="#C8C8C8"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -36,6 +57,7 @@
         android:layout_marginEnd="25dp"
         android:gravity="center"
         android:text="닉네임"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toStartOf="@+id/edit_input_nickname"
         app:layout_constraintTop_toBottomOf="@+id/edit_name" />
 
@@ -45,8 +67,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:layout_marginEnd="50dp"
+        android:backgroundTint="@color/black"
         android:hint="ex. 숙크루지"
         android:inputType="text"
+        android:textColor="@color/black"
+        android:textColorHint="#C8C8C8"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edit_input_name" />
@@ -71,6 +96,7 @@
         android:layout_marginEnd="25dp"
         android:gravity="center"
         android:text="이메일"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toStartOf="@+id/edit_input_email"
         app:layout_constraintTop_toBottomOf="@+id/edit_text_nickname" />
 
@@ -80,9 +106,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:layout_marginEnd="50dp"
+        android:backgroundTint="@color/black"
+        android:enabled="false"
         android:hint="ex. sookcrooge@naver.com"
         android:inputType="text"
-        android:enabled="false"
+        android:textColor="@color/black"
+        android:textColorHint="#C8C8C8"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edit_input_nickname" />
@@ -96,6 +125,7 @@
         android:gravity="center"
         android:text="비밀번호"
 
+        android:textColor="@color/black"
         app:layout_constraintEnd_toStartOf="@+id/edit_input_password"
         app:layout_constraintTop_toBottomOf="@+id/edit_text_email" />
 
@@ -105,8 +135,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:layout_marginEnd="50dp"
+        android:backgroundTint="@color/black"
         android:hint="영문, 숫자 포함 8자리 이상"
         android:inputType="text"
+        android:textColor="@color/black"
+        android:textColorHint="#C8C8C8"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edit_input_email" />
@@ -132,6 +165,7 @@
         android:layout_marginEnd="50dp"
         android:backgroundTint="#a3cca2"
         android:text="정보수정"
+        android:background="@drawable/green_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edit_warning_password" />
@@ -143,6 +177,7 @@
         android:layout_marginTop="30dp"
         android:backgroundTint="#4d4d4d"
         android:text="회원탈퇴"
+        android:background="@drawable/gray_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editProfileButton" />
