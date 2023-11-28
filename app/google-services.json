@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1013955793318",
+    "project_id": "sookcrooge",
+    "storage_bucket": "sookcrooge.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1013955793318:android:24afd607c7e9fdd820ff67",
+        "android_client_info": {
+          "package_name": "com.example.sookcrooge"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZiuagm5-1ExCY7YEarERmOws_9p0ORHo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

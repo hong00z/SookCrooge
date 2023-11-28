@@ -7,6 +7,10 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.sookcrooge.databinding.ActivityResetPasswordBinding
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import java.util.Timer
 import java.util.TimerTask
 
@@ -19,6 +23,7 @@ class ResetPassword : AppCompatActivity() {
     private var isVerified= false
     private var verificationCode = ""
     var timer = Timer()
+    val db = Firebase.firestore
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -46,20 +51,32 @@ class ResetPassword : AppCompatActivity() {
             {
                 return@setOnClickListener
             }
-            createVerificationCode()
+            db.collection("users")
+                .whereEqualTo("email", binding.resetPWDInputEmail.text.toString())
+                .get()
+                .addOnSuccessListener {documents->
+                    if (documents.size() == 0)
+                    {
+                        binding.resetPWDWarningEmail.visibility = View.VISIBLE
+                    }
+                    else
+                    {
+                        binding.resetPWDWarningEmail.visibility = View.INVISIBLE
+                        class mailSenderThread():Thread(){
+                            override fun run()
+                            {
+                                val receiverEmail = binding.resetPWDInputEmail.text.toString()
+                                val sender = EmailSender(receiverEmail, verificationCode)
+                                sender.sendMail()
+                            }
+                        }
+                        val testThread = mailSenderThread()
+                        testThread.start()
 
-            class mailSenderThread():Thread(){
-                override fun run()
-                {
-                    val receiverEmail = binding.resetPWDInputEmail.text.toString()
-                    val sender = EmailSender(receiverEmail, verificationCode)
-                    sender.sendMail()
+                        setTimer()
+                    }
                 }
-            }
-            val testThread = mailSenderThread()
-            testThread.start()
 
-            setTimer()
 
         }
         binding.reSendVerificationCode.setOnClickListener {
@@ -102,6 +119,25 @@ class ResetPassword : AppCompatActivity() {
             {
                 binding.resetPWDWarningPasswordConfirm.visibility= View.VISIBLE
             }
+
+            val user = Firebase.auth.currentUser
+            val newPassword = binding.resetPWDInputPassword.text.toString()
+
+            user!!.updatePassword(newPassword)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d("hs", "User password updated.")
+                    }
+                }
+
+            var map= mutableMapOf<String,Any>()
+            map["password"] =newPassword
+            db.collection("users").document(user.uid).update(map)
+                .addOnCompleteListener{
+                    if(it.isSuccessful){
+                        Log.d("hs", "업데이트됨")
+                    }
+                }
 
             //추후 구현: 모든 조건 충족되면 바뀐 비밀번호 저장 후 로그인 화면으로 돌아가기.
             finish()

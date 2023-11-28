@@ -1,38 +1,92 @@
 package com.example.sookcrooge
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import com.example.sookcrooge.databinding.ActivityMainBinding
+import androidx.appcompat.app.AppCompatActivity
 import com.example.sookcrooge.databinding.ActivitySignUpBinding
+import com.google.android.gms.tasks.Tasks
+import com.google.android.play.integrity.internal.f
+import com.google.android.play.integrity.internal.t
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GetTokenResult
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import java.util.concurrent.ExecutionException
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+
 
 class SignUp : AppCompatActivity() {
     val binding: ActivitySignUpBinding by lazy {
         ActivitySignUpBinding.inflate(layoutInflater)
     }
+    private lateinit var auth: FirebaseAuth
+    val db = Firebase.firestore
+    var hasQueryResult: Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
+        auth = Firebase.auth
 
         binding.signUpButton.setOnClickListener {
             if (isAllConditionQualified())
             {
+
+                val name=binding.registerInputName.text.toString()
+                val email= binding.registerInputEmail.text.toString()
+                val password = binding.registerInputPassword.text.toString()
+                val nickname=binding.registerInputNickname.text.toString()
+                auth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this) { task ->
+                        if (task.isSuccessful)
+                        {
+                            val userUID: String? = auth.currentUser?.uid
+                            val newUser = hashMapOf(
+                                "uid" to userUID,
+                                "email" to email,
+                                "password" to password,
+                                "name" to name,
+                                "nickname" to nickname
+                            )
+
+                            db.collection("users")
+                                .document(userUID!!).set(newUser)
+                                .addOnSuccessListener {
+                                    Log.d("hs", "저장 완료")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.w("hs", "Error adding document", e)
+                                }
+
+                        }
+                        else
+                        {
+                            Log.d("hs", "회원 가입 실패")
+                        }
+                    }
                 //추후 구현: 모든 조건을 만족한다면 DB에 저장.
-                finish()
+                //finish()
             }
 
         }
 
     }
+
+
     @SuppressLint("SuspiciousIndentation")
     private fun isPasswordQualified():Boolean
     {
@@ -65,11 +119,43 @@ class SignUp : AppCompatActivity() {
     {
         var condition = true
 
-        //(추후 구현) 이미 닉네임이 있다면
-        binding.registerWarningNickname.visibility = View.VISIBLE
+        CoroutineScope(Dispatchers.IO).launch{
+            val hasSameString = getTokenResult("nickname", binding.registerInputNickname.text.toString())
+            if (hasSameString==true)
+            {
+                Log.d("jhs", "닉네임 중복 있음")
+                runOnUiThread {
+                    binding.registerWarningNickname.visibility = View.VISIBLE
+                }
+                condition = false
+            }
+            else
+            {
+                Log.d("jhs", "닉네임 중복 없음")
+                runOnUiThread {
+                    binding.registerWarningNickname.visibility = View.INVISIBLE
+                }
+            }
 
-        //(추후 구현) 이미 가입한 메일이라면
-        binding.registerWarningEmail.visibility = View.VISIBLE
+        }
+
+        CoroutineScope(Dispatchers.IO).launch{
+            val hasSame = getTokenResult("email", binding.registerInputEmail.text.toString())
+            if (hasSame==true)
+            {
+                runOnUiThread {
+                    binding.registerWarningEmail.visibility = View.VISIBLE
+                }
+                condition = false
+            }
+            else
+            {
+                runOnUiThread {
+                    binding.registerWarningEmail.visibility = View.INVISIBLE
+                }
+            }
+
+        }
 
         if (isPasswordQualified())
         {
@@ -101,5 +187,30 @@ class SignUp : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private suspend fun getTokenResult (field: String, findItem: String) = suspendCoroutine<Boolean> { continuation ->
+        val task = db.collection("users")
+            .whereEqualTo(field, findItem)
+            .get().addOnCompleteListener {
+            if (it.isSuccessful) {
+                if (it.result.size()==0)
+                {
+                    continuation.resume(false)
+                }
+                else
+                {
+                    continuation.resume(true)
+                }
+
+            }
+        }
+    }
+    private fun hasDataOnDB(field: String, findItem: String): Boolean {
+
+        CoroutineScope(Dispatchers.IO).launch{
+            val tempToken = getTokenResult(field, findItem)
+        }
+        return hasQueryResult
     }
 }
