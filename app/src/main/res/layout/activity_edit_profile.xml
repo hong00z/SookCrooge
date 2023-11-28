@@ -19,6 +19,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            app:titleTextColor="@color/white"
             app:title="정보 수정"/>
     </com.google.android.material.appbar.AppBarLayout>
     <TextView
@@ -177,6 +178,7 @@
         android:layout_marginTop="30dp"
         android:backgroundTint="#4d4d4d"
         android:text="회원탈퇴"
+        android:textColor="@color/white"
         android:background="@drawable/gray_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

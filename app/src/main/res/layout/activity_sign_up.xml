@@ -19,6 +19,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            app:titleTextColor="@color/white"
             app:title="회원 가입"/>
     </com.google.android.material.appbar.AppBarLayout>
     <TextView
@@ -215,6 +216,7 @@
         android:layout_marginEnd="50dp"
         android:backgroundTint="#a3cca2"
         android:text="회원가입"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:background="@drawable/green_button"
