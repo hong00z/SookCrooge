@@ -19,9 +19,16 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import org.checkerframework.framework.qual.DefaultFor
 import java.util.concurrent.ExecutionException
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -66,19 +73,18 @@ class SignUp : AppCompatActivity() {
                             db.collection("users")
                                 .document(userUID!!).set(newUser)
                                 .addOnSuccessListener {
-                                    Log.d("hs", "저장 완료")
+                                    Log.d("jhs", "저장 완료")
                                 }
                                 .addOnFailureListener { e ->
-                                    Log.w("hs", "Error adding document", e)
+                                    Log.w("jhs", "Error adding document", e)
                                 }
 
                         }
                         else
                         {
-                            Log.d("hs", "회원 가입 실패")
+                            Log.d("jhs", "회원 가입 실패")
                         }
                     }
-                //추후 구현: 모든 조건을 만족한다면 DB에 저장.
                 //finish()
             }
 
@@ -115,15 +121,16 @@ class SignUp : AppCompatActivity() {
         return password == passwordConfirm
     }
 
+
     private fun isAllConditionQualified():Boolean
     {
-        var condition = true
 
+        var condition = true
+        var testCondition : Deferred<Boolean>
         CoroutineScope(Dispatchers.IO).launch{
             val hasSameString = getTokenResult("nickname", binding.registerInputNickname.text.toString())
             if (hasSameString==true)
             {
-                Log.d("jhs", "닉네임 중복 있음")
                 runOnUiThread {
                     binding.registerWarningNickname.visibility = View.VISIBLE
                 }
@@ -131,15 +138,10 @@ class SignUp : AppCompatActivity() {
             }
             else
             {
-                Log.d("jhs", "닉네임 중복 없음")
                 runOnUiThread {
                     binding.registerWarningNickname.visibility = View.INVISIBLE
                 }
             }
-
-        }
-
-        CoroutineScope(Dispatchers.IO).launch{
             val hasSame = getTokenResult("email", binding.registerInputEmail.text.toString())
             if (hasSame==true)
             {
@@ -154,9 +156,7 @@ class SignUp : AppCompatActivity() {
                     binding.registerWarningEmail.visibility = View.INVISIBLE
                 }
             }
-
         }
-
         if (isPasswordQualified())
         {
             binding.registerWarningPassword.visibility = View.INVISIBLE
@@ -213,4 +213,5 @@ class SignUp : AppCompatActivity() {
         }
         return hasQueryResult
     }
+
 }

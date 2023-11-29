@@ -126,7 +126,7 @@ class ResetPassword : AppCompatActivity() {
             user!!.updatePassword(newPassword)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Log.d("hs", "User password updated.")
+                        Log.d("jhs", "User password updated.")
                     }
                 }
 
@@ -135,11 +135,10 @@ class ResetPassword : AppCompatActivity() {
             db.collection("users").document(user.uid).update(map)
                 .addOnCompleteListener{
                     if(it.isSuccessful){
-                        Log.d("hs", "업데이트됨")
+                        Log.d("jhs", "업데이트됨")
                     }
                 }
 
-            //추후 구현: 모든 조건 충족되면 바뀐 비밀번호 저장 후 로그인 화면으로 돌아가기.
             finish()
         }
 
