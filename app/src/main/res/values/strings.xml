@@ -23,7 +23,7 @@
         <item>NOV</item>
         <item>DEC</item>
     </string-array>
-    
+
     <string-array name="tag">
         <item>식비</item>
         <item>쇼핑</item>
@@ -34,4 +34,8 @@
         <item>경조사비</item>
         <item>데이트</item>
         <item>기타</item>
-    </string-array></resources>
+    </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="chat_toolbar_name">내 채팅방</string>
+</resources>
