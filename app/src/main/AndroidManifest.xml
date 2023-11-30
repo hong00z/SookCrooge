@@ -17,7 +17,7 @@
 
 
         <activity
-            android:name=".EditProfile"
+            android:name=".CalendarActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,7 +28,10 @@
             android:name=".ResetPassword"
             android:exported="false">
         </activity>
-
+        <activity
+            android:name=".ChatActivity"
+            android:exported="false">
+        </activity>
         <activity
             android:name=".SignUp"
             android:exported="true">
@@ -40,8 +43,13 @@
             android:exported="true" />
 
         <activity
-            android:name=".CalendarActivity"
+            android:name=".EditProfile"
             android:exported="true"/>
+
+        <activity
+            android:name=".AddCalendar"
+            android:exported="false">
+        </activity>
     </application>
 
 </manifest>

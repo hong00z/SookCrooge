@@ -6,4 +6,6 @@
     <color name="dark_gray">#4D4D4D</color>
     <color name="cal_gray">#CCCCCC</color>
     <color name="red">#D1180B</color>
+    <color name="chat_gray">#e9ecef</color>
+    <color name="user_num">#FFC61A</color>
 </resources>

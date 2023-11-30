@@ -5,13 +5,14 @@
     android:layout_width="match_parent"
     android:background="@color/white"
     android:layout_height="match_parent">
+
+
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
-        android:padding="10dp"
         android:id="@+id/materialCalendar"
         app:mcv_selectionColor="@color/main_green"
         android:layout_width="wrap_content"
         android:layout_gravity="center"
-        android:layout_height="430dp"
+        android:layout_height="400dp"
         />
     <LinearLayout
         android:layout_width="wrap_content"
@@ -39,12 +40,14 @@
             android:text="원"/>
     </LinearLayout>
 
+
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:padding="5dp"
         android:id="@+id/recycler_view">
     </androidx.recyclerview.widget.RecyclerView>
+
+
 
 </LinearLayout>
