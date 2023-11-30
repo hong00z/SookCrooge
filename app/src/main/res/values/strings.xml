@@ -1,3 +1,37 @@
 <resources>
     <string name="app_name">SookCrooge</string>
-</resources>
+    <string-array name="custom_weekdays">
+        <item>Sun</item>
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+    </string-array>
+    <string-array name="custom_months">
+        <item>JAN</item>
+        <item>FEB</item>
+        <item>MAR</item>
+        <item>APR</item>
+        <item>MAY</item>
+        <item>JUN</item>
+        <item>JUL</item>
+        <item>AUG</item>
+        <item>SEP</item>
+        <item>OCT</item>
+        <item>NOV</item>
+        <item>DEC</item>
+    </string-array>
+    
+    <string-array name="tag">
+        <item>식비</item>
+        <item>쇼핑</item>
+        <item>교통비</item>
+        <item>정기결제</item>
+        <item>공과금</item>
+        <item>통신비</item>
+        <item>경조사비</item>
+        <item>데이트</item>
+        <item>기타</item>
+    </string-array></resources>
