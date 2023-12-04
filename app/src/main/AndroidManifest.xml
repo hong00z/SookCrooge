@@ -17,7 +17,7 @@
 
 
         <activity
-            android:name=".ChatActivity"
+            android:name=".InitialActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,6 +28,8 @@
             android:name=".ResetPassword"
             android:exported="false">
         </activity>
+        <activity android:name=".Login"
+            android:exported="true"/>
         <activity
             android:name=".CalendarActivity"
             android:exported="false">
