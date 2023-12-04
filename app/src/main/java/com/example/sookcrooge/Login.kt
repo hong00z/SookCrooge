@@ -1,4 +1,4 @@
-package com.example.sookrooge
+package com.example.sookcrooge
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -6,6 +6,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
+
+
 
 class Login : AppCompatActivity() {
     lateinit var btnLogin: ImageButton
@@ -21,6 +23,7 @@ class Login : AppCompatActivity() {
         btnLogin!!.setOnClickListener {
             val user = editTextId!!.text.toString()
             val pass = editTextPassword!!.text.toString()
+
 
             if (user == "" || pass == "") {
                 Toast.makeText(this@Login, "아이디와 비밀번호를 모두 입력해주세요.", Toast.LENGTH_SHORT).show()

@@ -18,6 +18,10 @@ class InitialActivity : AppCompatActivity() {
             val intent = Intent(this,SignUp::class.java)
             startActivity(intent)
         }
+        binding.btnLogin.setOnClickListener {
+            val intent2 = Intent(this, Login::class.java)
+            startActivity(intent2)
+        }
 
 
 
