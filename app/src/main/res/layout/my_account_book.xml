@@ -6,13 +6,13 @@
     android:background="@color/white"
     android:layout_height="match_parent">
 
-
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
         android:id="@+id/materialCalendar"
         app:mcv_selectionColor="@color/main_green"
         android:layout_width="wrap_content"
         android:layout_gravity="center"
         android:layout_height="400dp"
+        android:layout_marginTop="10dp"
         />
     <LinearLayout
         android:layout_width="wrap_content"
@@ -40,13 +40,32 @@
             android:text="원"/>
     </LinearLayout>
 
+<RelativeLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:id="@+id/recycler_view">
+        android:layout_height="252dp"
+        android:layout_gravity="center">
     </androidx.recyclerview.widget.RecyclerView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floating_action_button"
+        style="@style/Widget.Design.FloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignBottom="@id/recycler_view"
+        android:layout_gravity="end"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="25dp"
+        android:backgroundTint="@color/main_green"
+        android:contentDescription="TODO"
+        app:srcCompat="@drawable/ic_add"
+        app:tint="#FFFFFF" />
+</RelativeLayout>
 
 
 
