@@ -1,10 +1,16 @@
 package com.example.sookcrooge
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sookcrooge.databinding.FragmentChat1Binding
 
@@ -29,6 +35,7 @@ class ChatFragment1 : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
     }
 
     override fun onCreateView(
@@ -36,7 +43,8 @@ class ChatFragment1 : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val binding = FragmentChat1Binding.inflate(layoutInflater,container,false)
-        var chatData = mutableListOf<String>("할인 정보방","넷플팟 구해요","채팅방1","채팅방2")
+        var chatData = mutableListOf<String>()
+
         val layoutManager = LinearLayoutManager(activity)
         binding.recyclerChat1.layoutManager = layoutManager
         val adapter = ChatAdapter(chatData)
