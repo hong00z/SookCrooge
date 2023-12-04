@@ -24,6 +24,7 @@ class Login : AppCompatActivity() {
             val user = editTextId!!.text.toString()
             val pass = editTextPassword!!.text.toString()
 
+
             if (user == "" || pass == "") {
                 Toast.makeText(this@Login, "아이디와 비밀번호를 모두 입력해주세요.", Toast.LENGTH_SHORT).show()
             }
