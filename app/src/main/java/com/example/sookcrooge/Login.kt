@@ -1,4 +1,4 @@
-package com.example.sookrooge
+package com.example.sookcrooge
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
