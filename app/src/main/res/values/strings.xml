@@ -23,7 +23,7 @@
         <item>NOV</item>
         <item>DEC</item>
     </string-array>
-    
+
     <string-array name="tag">
         <item>식비</item>
         <item>쇼핑</item>
@@ -34,4 +34,5 @@
         <item>경조사비</item>
         <item>데이트</item>
         <item>기타</item>
-    </string-array></resources>
+    </string-array>
+</resources>

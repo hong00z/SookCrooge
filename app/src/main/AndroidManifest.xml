@@ -14,33 +14,40 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SookCrooge"
         tools:targetApi="31">
-
-
         <activity
-            android:name=".EditProfile"
+            android:name=".Chatting"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".ResetPassword"
-            android:exported="false">
+            android:name=".OthersCalendar"
+            android:exported="true">
+
+
         </activity>
 
         <activity
+            android:name=".EditProfile"
+            android:exported="true"></activity>
+        <activity
+            android:name=".ResetPassword"
+            android:exported="false" />
+        <activity
             android:name=".SignUp"
-            android:exported="false">
-        </activity>
-
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true" />
-
         <activity
             android:name=".CalendarActivity"
-            android:exported="true"/>
+            android:exported="true" />
+        <activity
+            android:name=".InitialActivity"
+            android:exported="true"></activity>
     </application>
 
 </manifest>
