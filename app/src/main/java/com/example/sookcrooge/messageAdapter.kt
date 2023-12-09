@@ -9,8 +9,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.play.integrity.internal.aa
+import java.text.SimpleDateFormat
 
-data class MessageModel(val type: Int, val userName: String, val messageText: String) {
+data class MessageModel(val type: Int, val userName: String, val messageText: String, val timeStampLong: Long) {
     companion object {
         const val MY_MESSAGE = 0
         const val OTHERS_MESSAGE = 1
@@ -21,6 +23,8 @@ class messageAdapter(val context: Context, private val dataset: List<MessageMode
     class messageViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
         val userName: TextView = view.findViewById(R.id.username)
         val messageText: TextView = view.findViewById(R.id.messageText)
+        val hour: TextView=view.findViewById(R.id.hour)
+        val min: TextView=view.findViewById(R.id.min)
     }
     override fun getItemViewType(position: Int): Int {
         return dataset[position].type
@@ -45,6 +49,8 @@ class messageAdapter(val context: Context, private val dataset: List<MessageMode
         val item = dataset[position]
         holder.userName.text = item.userName
         holder.messageText.text = item.messageText
+        holder.hour.text= SimpleDateFormat("HH").format(item.timeStampLong)
+        holder.min.text= SimpleDateFormat("mm").format(item.timeStampLong)
     }
 
     override fun getItemCount(): Int {

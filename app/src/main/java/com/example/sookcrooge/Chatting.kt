@@ -1,38 +1,202 @@
 package com.example.sookcrooge
 
 import android.content.Context
+import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.motion.widget.Key.VISIBILITY
 import androidx.core.view.size
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sookcrooge.MessageModel.Companion.MY_MESSAGE
 import com.example.sookcrooge.MessageModel.Companion.OTHERS_MESSAGE
+import com.example.sookcrooge.databinding.AccountListBinding
 import com.example.sookcrooge.databinding.ActivityChattingBinding
 import com.example.sookcrooge.databinding.ChattingUsersBinding
+import com.google.firebase.Timestamp
+import com.google.firebase.Timestamp.now
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.jakewharton.threetenabp.AndroidThreeTen
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.StringTokenizer
+
 
 class Chatting : AppCompatActivity() {
+    private lateinit var auth: FirebaseAuth
+    val db = Firebase.firestore
     val messageList = mutableListOf<MessageModel>()
+    private lateinit var userNickname:String
+    private var accountWindowUserName:String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AndroidThreeTen.init(this)
         val binding=ActivityChattingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        var datas = mutableListOf<String>("숙크루지1","숙크루지2", "숙크루지3", "숙크루지4")
+        auth=Firebase.auth
+        val user=auth.currentUser!!
+
+        val userQuery = db.collection("users").whereEqualTo("uid", user.uid).get()
+            .addOnSuccessListener{
+                it.forEach{document->
+                    userNickname=document["nickname"].toString()
+                }
+
+                val chatting = db.collection("chattingRoom_shdknm1hks").orderBy("time")
+                chatting.addSnapshotListener{ snapshot, e ->
+                    for (document in snapshot!!.documentChanges) {
+                        if (document.type == DocumentChange.Type.ADDED)
+                        {
+                            var timeStamp = document.document.data["time"] as Timestamp
+                            val timeStampLong=timeStamp.seconds*1000+32400000
+                            if (document.document.data["nickname"].toString()==userNickname)
+                            {
+                                messageList.add(MessageModel(MY_MESSAGE, document.document.data["nickname"].toString(),
+                                    document.document.data["text"].toString(), timeStampLong))
+                            }
+                            else
+                            {
+                                messageList.add(MessageModel(OTHERS_MESSAGE, document.document.data["nickname"].toString(),
+                                    document.document.data["text"].toString(), timeStampLong))
+                            }
+                        }
+
+                    }
+                    binding.messageRecycler.layoutManager = LinearLayoutManager(this)
+                    binding.messageRecycler.adapter = messageAdapter(this, messageList)
+                }
+
+            }
+        var userAccountWindowDatas = mutableListOf<String>()
+
+        val chattingUsersQuery = db.collection("rooms").document("W2U5O23pUoksmknw1Kqc")
+        chattingUsersQuery.addSnapshotListener{snapshots, e ->
+            userAccountWindowDatas.clear()
+            val chattingUsers = snapshots!!.data?.get("chatUsers").toString()
+            val st = StringTokenizer(chattingUsers, ",")
+            while (st.hasMoreTokens())
+            {
+                val name=st.nextToken()
+                userAccountWindowDatas.add(name)
+            }
+
+            runOnUiThread{
+                binding.userRecycler.adapter = usersAdapter(userAccountWindowDatas)
+                usersAdapter(userAccountWindowDatas).notifyDataSetChanged()
+            }
+
+            (binding.userRecycler.adapter as usersAdapter).setItemClickListener(object: usersAdapter.OnItemClickListener{
+                override fun onClick(v: View, position: Int) {
+                    if (binding.userAccountWindow.visibility == View.GONE)
+                    {
+                        binding.userAccountWindow.visibility= View.VISIBLE
+                        accountWindowUserName=userAccountWindowDatas[position]
+                    }
+                    else
+                    {
+                        if (userAccountWindowDatas[position]==accountWindowUserName)
+                        {
+                            binding.userAccountWindow.visibility= View.GONE
+                        }
+                        else
+                        {
+                            accountWindowUserName=userAccountWindowDatas[position]
+                        }
+                    }
+                    var itemDatas = mutableListOf<accountItem>()
+                    var today=System.currentTimeMillis()
+                    today+=32400000
+                    today-=today%86400000
+                    val todayDate=Date(today)
+                    val todayTimestamp=Timestamp(todayDate)
+                    db.collection("users").whereEqualTo("nickname", accountWindowUserName).get().addOnSuccessListener {
+                        val othersUserUID=it.documents[0].data?.get("uid").toString()
+                        db.collection(othersUserUID).whereGreaterThan("date", todayTimestamp).orderBy("date").get().addOnSuccessListener{documents->
+                            if (documents.size()==0)
+                            {
+                                binding.noSpendOrSaveText.visibility=View.VISIBLE
+                                binding.noSpendOrSaveText.text=accountWindowUserName+"님은" +
+                                        " 오늘의 소비/절약이 없습니다."
+                                binding.itemRecycler.visibility=View.GONE
+
+                            }
+                            else
+                            {
+                                binding.noSpendOrSaveText.visibility=View.GONE
+                                binding.itemRecycler.visibility=View.VISIBLE
+                                for (document in documents)
+                                {
+                                    var timeStamp = document.data["date"] as com.google.firebase.Timestamp
+                                    val timeStampLong=timeStamp.seconds*1000+32400
+                                    val month= SimpleDateFormat("MM").format(timeStampLong)
+                                    val day= SimpleDateFormat("dd").format(timeStampLong)
+
+                                    val newItem = accountItem(document.id, document.data["name"].toString(), document.data["cost"].toString().toInt(),
+                                        (month.toInt()-1).toString(), day, document.data["type"].toString(),
+                                        document.data["angry"].toString().toInt(), document.data["smile"].toString().toInt(), document.data["tag"].toString())
+                                    itemDatas.add(newItem)
+                                }
+                                binding.itemRecycler.adapter = OthersAccountAdapter(itemDatas)
+                                (binding.itemRecycler.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
+                                    override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
+                                        binding.smileText.text= (data.smile+1).toString()
+                                        db.collection(othersUserUID).document(data.documentID).update("smile", (data.smile+1))
+                                    }
+                                    override fun onAngryClick(binding: AccountListBinding, data: accountItem) {
+                                        binding.angryText.text= (data.angry+1).toString()
+                                        db.collection(othersUserUID).document(data.documentID).update("angry", (data.angry+1))
+                                    }
+                                })
+                            }
+                            runOnUiThread{
+                                OthersAccountAdapter(itemDatas).notifyDataSetChanged()
+                            }
+                        }
+                    }
+
+
+                }
+            }
+            )
+        }
         binding.userRecycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding.userRecycler.adapter = usersAdapter(datas)
+        binding.userRecycler.adapter = usersAdapter(userAccountWindowDatas)
 
-        var itemDatas = mutableListOf<String>("수박", "사과")
-        binding.itemRecycler.layoutManager = LinearLayoutManager(this)
-        binding.itemRecycler.adapter = AccountAdapter(itemDatas)
+
+
+
 
         binding.sendButton.setOnClickListener{
+            if (binding.chattingEditText.text.toString().isEmpty())
+            {
+                return@setOnClickListener
+            }
+            val currentTime=now()
+            val newMessage = hashMapOf(
+                "nickname" to userNickname,
+                "text" to binding.chattingEditText.text.toString(),
+                "time" to currentTime,
+            )
+            db.collection("chattingRoom_shdknm1hks")
+                .add(newMessage)
             binding.userAccountWindow.visibility= View.GONE
-            messageList.add(MessageModel(MY_MESSAGE, "숙크루지",binding.chattingEditText.text.toString()))
+            //messageList.add(MessageModel(MY_MESSAGE, userNickname,binding.chattingEditText.text.toString()))
             binding.chattingEditText.setText("")
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(binding.chattingEditText.windowToken, 0)
@@ -43,14 +207,30 @@ class Chatting : AppCompatActivity() {
             binding.userAccountWindow.visibility= View.GONE
         }
 
-        messageList.add(MessageModel(OTHERS_MESSAGE, "숙크루지1","Hello world!"))
-        messageList.add(MessageModel(MY_MESSAGE, "숙크루지","안녕"))
-        messageList.add(MessageModel(OTHERS_MESSAGE, "숙크루지","안녕!"))
+        binding.chattingEditText.setOnFocusChangeListener { v, hasFocus ->
+            binding.userAccountWindow.visibility= View.GONE
+        }
 
-        binding.messageRecycler.layoutManager = LinearLayoutManager(this)
-        binding.messageRecycler.adapter = messageAdapter(this, messageList)
+
+        binding.moveToAccount.setOnClickListener {
+            val userQuery = db.collection("users").whereEqualTo("nickname", accountWindowUserName).get().addOnSuccessListener{
+                val intent = Intent(this, OthersCalendar::class.java)
+                intent.putExtra("uid", it.documents[0].id)
+                intent.putExtra("nickname", it.documents[0].data?.get("nickname").toString())
+                startActivity(intent)
+            }
+
+        }
     }
 
 
-
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
 }

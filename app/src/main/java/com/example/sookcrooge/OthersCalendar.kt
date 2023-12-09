@@ -5,15 +5,21 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
+import android.provider.SyncStateContract.Helpers.update
 import android.text.style.ForegroundColorSpan
 import android.text.style.LineBackgroundSpan
 import android.util.Log
+import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.get
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.sookcrooge.databinding.AccountListBinding
 import com.example.sookcrooge.databinding.ActivityOthersAccountBookBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.prolificinteractive.materialcalendarview.CalendarDay
@@ -36,98 +42,139 @@ class OthersCalendar : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         var binding = ActivityOthersAccountBookBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         auth= Firebase.auth
 
+        val intent= intent
+        val otherUserUID=intent.getStringExtra("uid")
+        binding.toolbar.title=intent.getStringExtra("nickname")+"의 가계부"
+
         val decoratorList= mutableListOf<calendarDates>()
-        val sdf=SimpleDateFormat("yyyy-MM-dd")
         val allDatas = mutableListOf<accountItem>()
-        val currentMonthDatas=mutableListOf<accountItem>()
+        val selectedMonthDatas=mutableListOf<accountItem>()
+        var adapter=OthersAccountAdapter(selectedMonthDatas)
         var selectedMonthSpend=0
-        db.collection("JROKAAj8GRc49JZxLvXRpsUYZqH3")
-            .orderBy("date")
-            .get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    var timeStamp = document["date"] as com.google.firebase.Timestamp
-                    val timeStampLong=timeStamp.seconds*1000+32400
-                    val year = SimpleDateFormat("YYYY").format(timeStampLong)
-                    val month=SimpleDateFormat("MM").format(timeStampLong)
-                    val day=SimpleDateFormat("dd").format(timeStampLong)
-                    val calendarDayListTemp = ArrayList<CalendarDay>()
-                    val calendarDay = CalendarDay.from(year.toInt(), month.toInt()-1, day.toInt())
-                    calendarDayListTemp.add(CalendarDay.from(year.toInt(), month.toInt()-1, day.toInt()))
+        var currentSelectedMonth=CalendarDay.today().month
 
-                    val hasAlreadyDate = decoratorList.find{it.date.equals(calendarDay)}
-                    if (hasAlreadyDate==null)
-                    {
-                        Log.d("jhs", "중복 날짜 없음")
-                        if (document["type"]=="save")
+        val dataQuery = db.collection(otherUserUID.toString()).orderBy("date")
+        dataQuery.addSnapshotListener { snapshots, e ->
+            for (dc in snapshots!!.documentChanges) {
+                when (dc.type) {
+                    DocumentChange.Type.ADDED -> {
+                        var timeStamp = dc.document.data["date"] as com.google.firebase.Timestamp
+                        val timeStampLong=timeStamp.seconds*1000+32400
+                        val year = SimpleDateFormat("YYYY").format(timeStampLong)
+                        val month=SimpleDateFormat("MM").format(timeStampLong)
+                        val day=SimpleDateFormat("dd").format(timeStampLong)
+                        val calendarDayListTemp = ArrayList<CalendarDay>()
+                        val calendarDay = CalendarDay.from(year.toInt(), month.toInt()-1, day.toInt())
+                        calendarDayListTemp.add(CalendarDay.from(year.toInt(), month.toInt()-1, day.toInt()))
+                        val hasAlreadyDate = decoratorList.find{it.date.equals(calendarDay)}
+                        if (hasAlreadyDate==null)
                         {
-                            var decorator = planDotDecorator(calendarDayListTemp, document["cost"].toString().toInt(), 0,this)
-                            val data=calendarDates(calendarDay, document["cost"].toString().toInt(), 2000)
-                            decoratorList.add(data)
-                            binding.othersMaterialCalendar.addDecorator(decorator)
+                            if (dc.document.data["type"]=="save")
+                            {
+                                var decorator = planDotDecorator(calendarDayListTemp, dc.document.data["cost"].toString().toInt(), 0,this)
+                                val data=calendarDates(calendarDay, dc.document.data["cost"].toString().toInt(), 2000)
+                                decoratorList.add(data)
+                                binding.othersMaterialCalendar.addDecorator(decorator)
+                            }
+                            else
+                            {
+                                var decorator = planDotDecorator(calendarDayListTemp, 0, dc.document.data["cost"].toString().toInt(),this)
+                                val data=calendarDates(calendarDay,0 , dc.document.data["cost"].toString().toInt())
+                                decoratorList.add(data)
+                                binding.othersMaterialCalendar.addDecorator(decorator)
+                            }
                         }
                         else
                         {
-                            var decorator = planDotDecorator(calendarDayListTemp, 0, document["cost"].toString().toInt(),this)
-                            val data=calendarDates(calendarDay,0 , document["cost"].toString().toInt())
-                            decoratorList.add(data)
-                            binding.othersMaterialCalendar.addDecorator(decorator)
+
+                            //decorator 전체 지우고 다시 그리기
+                            decoratorList.remove(hasAlreadyDate)
+                            binding.othersMaterialCalendar.removeDecorators()
+                            decoratorList.forEach{
+                                val tempCalendarDayList = ArrayList<CalendarDay>()
+                                calendarDayListTemp.add(it.date)
+                                val decorator=planDotDecorator(tempCalendarDayList, it.saving, it.spend, this)
+                                binding.othersMaterialCalendar.addDecorator(decorator)
+                            }
+
+                            //decoratorList에 추가한 후 캘린더 뷰에 보이도록 추가
+                            if (dc.document.data["type"]=="save")
+                            {
+                                val data=calendarDates(calendarDay, hasAlreadyDate.saving+dc.document.data["cost"].toString().toInt(), hasAlreadyDate.spend)
+                                decoratorList.add(data)
+                                var decorator = planDotDecorator(calendarDayListTemp, hasAlreadyDate.saving+dc.document.data["cost"].toString().toInt(), hasAlreadyDate.spend,this)
+                                binding.othersMaterialCalendar.addDecorator(decorator)
+                            }
+                            else
+                            {
+                                val data=calendarDates(calendarDay, hasAlreadyDate.saving, hasAlreadyDate.spend+dc.document.data["cost"].toString().toInt())
+                                decoratorList.add(data)
+                                var decorator = planDotDecorator(calendarDayListTemp, hasAlreadyDate.saving, hasAlreadyDate.spend+dc.document.data["cost"].toString().toInt(),this)
+                                binding.othersMaterialCalendar.addDecorator(decorator)
+                            }
                         }
-
-
-                    }
-                    else
-                    {
-                        Log.d("jhs", hasAlreadyDate.toString())
-
-                        //decorator 전체 지우고 다시 그리기
-                        decoratorList.remove(hasAlreadyDate)
-                        binding.othersMaterialCalendar.removeDecorators()
-                        decoratorList.forEach{
-                            val tempCalendarDayList = ArrayList<CalendarDay>()
-                            calendarDayListTemp.add(it.date)
-                            val decorator=planDotDecorator(tempCalendarDayList, it.saving, it.spend, this)
-                            binding.othersMaterialCalendar.addDecorator(decorator)
-                        }
-
-                        //decoratorList에 추가한 후 캘린더 뷰에 보이도록 추가
-                        if (document["type"]=="save")
+                        val newItem = accountItem(dc.document.id, dc.document.data["name"].toString(), dc.document.data["cost"].toString().toInt(),
+                            (month.toInt()-1).toString(), day.toString(), dc.document.data["type"].toString(),
+                            dc.document.data["angry"].toString().toInt(), dc.document.data["smile"].toString().toInt(), dc.document.data["tag"].toString())
+                        allDatas.add(newItem)
+                        if (month.toInt()-1== currentSelectedMonth)
                         {
-                            val data=calendarDates(calendarDay, hasAlreadyDate.saving+document["cost"].toString().toInt(), hasAlreadyDate.spend)
-                            decoratorList.add(data)
-                            var decorator = planDotDecorator(calendarDayListTemp, hasAlreadyDate.saving+document["cost"].toString().toInt(), hasAlreadyDate.spend,this)
-                            binding.othersMaterialCalendar.addDecorator(decorator)
+                            selectedMonthDatas.add(newItem)
+                            if (dc.document.data["type"]=="spend")
+                            {
+                                selectedMonthSpend+=dc.document.data["cost"].toString().toInt()
+                            }
                         }
-                        else
-                        {
-                            val data=calendarDates(calendarDay, hasAlreadyDate.saving, hasAlreadyDate.spend+document["cost"].toString().toInt())
-                            decoratorList.add(data)
-                            var decorator = planDotDecorator(calendarDayListTemp, hasAlreadyDate.saving, hasAlreadyDate.spend+document["cost"].toString().toInt(),this)
-                            binding.othersMaterialCalendar.addDecorator(decorator)
-                        }
-
-
-                    }
-                    val newItem = accountItem(document["name"].toString(), document["cost"].toString().toInt(),
-                        (month.toInt()-1).toString(), day.toString(), document["type"].toString(),
-                        document["angry"].toString().toInt(), document["smile"].toString().toInt())
-                    allDatas.add(newItem)
-                    if (month.toInt()-1==CalendarDay.today().month)
-                    {
-                        currentMonthDatas.add(newItem)
-                        if (document["type"]=="spend")
-                        {
-                            selectedMonthSpend+=document["cost"].toString().toInt()
+                        selectedMonthDatas.sortWith(compareBy { it.date.toInt() })
+                        runOnUiThread{
+                            binding.totalMonthSpend.text=selectedMonthSpend.toString()
+                            binding.recyclerView.adapter = adapter
+                            OthersAccountAdapter(selectedMonthDatas).notifyDataSetChanged()
                         }
                     }
+                    DocumentChange.Type.MODIFIED -> {
+                        for (i in 0..<allDatas.size) {
+                            if (dc.document.id == allDatas[i].documentID)
+                            {
+                                allDatas[i].smile = dc.document.data["smile"].toString().toInt()
+                                allDatas[i].angry = dc.document.data["angry"].toString().toInt()
+                                break
+                            }
+                        }
+                        for (i in 0..<selectedMonthDatas.size)
+                        {
+                            if (dc.document.id == selectedMonthDatas[i].documentID)
+                            {
+                                selectedMonthDatas[i].smile = dc.document.data["smile"].toString().toInt()
+                                selectedMonthDatas[i].angry = dc.document.data["angry"].toString().toInt()
+                                runOnUiThread{
+                                    binding.recyclerView.adapter = adapter
+                                    OthersAccountAdapter(selectedMonthDatas).notifyDataSetChanged()
+                                }
+                                break
+                            }
+                        }
+                        (binding.recyclerView.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
+                            override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
+                                binding.smileText.text= (data.smile+1).toString()
+                                db.collection(otherUserUID.toString()).document(data.documentID).update("smile", (data.smile+1))
+                            }
+                            override fun onAngryClick(binding: AccountListBinding, data: accountItem) {
+                                binding.angryText.text= (data.angry+1).toString()
+                                db.collection(otherUserUID.toString()).document(data.documentID).update("angry", (data.angry+1))
+                            }
+                        })
+                    }
+                    else -> {}
                 }
-                binding.recyclerView.adapter = OthersAccountAdapter(currentMonthDatas)
-                binding.totalMonthSpend.text=selectedMonthSpend.toString()
             }
+        }
+
 
         //calendar 설정
         binding.othersMaterialCalendar.setDateTextAppearance(R.style.CustomDateTextAppearance)
@@ -142,7 +189,6 @@ class OthersCalendar : AppCompatActivity() {
         lateinit var calendar: MaterialCalendarView
         calendar = binding.othersMaterialCalendar
         calendar.setSelectedDate(CalendarDay.today())
-
         var startTimeCalendar = Calendar.getInstance()
         var endTimeCalendar = Calendar.getInstance()
 
@@ -174,9 +220,10 @@ class OthersCalendar : AppCompatActivity() {
         calendar.setOnMonthChangedListener(object: OnMonthChangedListener{
             override fun onMonthChanged(widget: MaterialCalendarView?, date: CalendarDay?) {
                 if (date != null) {
-                    val selectedMonthDatas = mutableListOf<accountItem>()
+                    selectedMonthDatas.clear()
                     selectedMonthSpend=0
                     binding.totalMonth.text = (date.month+1).toString()
+                    currentSelectedMonth=date.month
                     allDatas.forEach{
                         if (it.month.toInt()==date.month) {
                             if (it.type=="spend")
@@ -186,8 +233,21 @@ class OthersCalendar : AppCompatActivity() {
                             selectedMonthDatas.add(it)
                         }
                     }
+                    selectedMonthDatas.sortWith(compareBy { it.date.toInt() })
                     binding.recyclerView.adapter = OthersAccountAdapter(selectedMonthDatas)
+                    adapter.notifyDataSetChanged()
                     binding.totalMonthSpend.text=selectedMonthSpend.toString()
+                    (binding.recyclerView.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
+                        override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
+                            binding.smileText.text= (data.smile+1).toString()
+                            db.collection(otherUserUID.toString()).document(data.documentID).update("smile", (data.smile+1))
+                        }
+                        override fun onAngryClick(binding: AccountListBinding, data: accountItem) {
+                            binding.angryText.text= (data.angry+1).toString()
+                            db.collection(otherUserUID.toString()).document(data.documentID).update("angry", (data.angry+1))
+                        }
+                    })
+
                 }
             }
         })
@@ -293,13 +353,24 @@ class OthersCalendar : AppCompatActivity() {
 
 
     }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
 }
 
 
 data class calendarDates(val date: CalendarDay, val saving: Int, val spend: Int)
 
-class accountItem(name:String, cost:Int, month:String, date: String, type: String, angry:Int, smile: Int)
+class accountItem(documentID: String, name:String, cost:Int, month:String, date: String, type: String, angry:Int, smile: Int, tag:String)
 {
+    val documentID:String
     val name: String
     val cost: Int
     val month: String
@@ -307,7 +378,9 @@ class accountItem(name:String, cost:Int, month:String, date: String, type: Strin
     val type: String
     var angry: Int
     var smile: Int
+    val tag:String
     init {
+        this.documentID=documentID
         this.name=name
         this.cost=cost
         this.month=month
@@ -315,5 +388,6 @@ class accountItem(name:String, cost:Int, month:String, date: String, type: Strin
         this.type=type
         this.angry=angry
         this.smile=smile
+        this.tag=tag
     }
 }
