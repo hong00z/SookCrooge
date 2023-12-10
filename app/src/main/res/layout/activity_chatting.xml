@@ -34,6 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_marginTop="5dp"
         android:layout_gravity="center"
         android:background="@drawable/others_account_view"
         android:backgroundTint="#F7F7F7"
@@ -71,7 +72,6 @@
         android:layout_marginTop="30dp"
         android:layout_marginBottom="30dp"
         android:id="@+id/noSpendOrSaveText"
-        android:visibility="gone"
         />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/itemRecycler"
@@ -79,6 +79,7 @@
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="165dp"
+        android:visibility="gone"
         />
     </GridLayout>
 

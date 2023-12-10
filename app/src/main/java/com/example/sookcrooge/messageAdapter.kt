@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.play.integrity.internal.aa
 import java.text.SimpleDateFormat
 
-data class MessageModel(val type: Int, val userName: String, val messageText: String, val timeStampLong: Long) {
+data class MessageModel(val type: Int, val userName: String, val messageText: String, val timeStampLong: Long, val dateCheck: Boolean) {
     companion object {
         const val MY_MESSAGE = 0
         const val OTHERS_MESSAGE = 1
@@ -25,6 +25,7 @@ class messageAdapter(val context: Context, private val dataset: List<MessageMode
         val messageText: TextView = view.findViewById(R.id.messageText)
         val hour: TextView=view.findViewById(R.id.hour)
         val min: TextView=view.findViewById(R.id.min)
+        val chattingDate:TextView=view.findViewById(R.id.chattingDate)
     }
     override fun getItemViewType(position: Int): Int {
         return dataset[position].type
@@ -51,6 +52,19 @@ class messageAdapter(val context: Context, private val dataset: List<MessageMode
         holder.messageText.text = item.messageText
         holder.hour.text= SimpleDateFormat("HH").format(item.timeStampLong)
         holder.min.text= SimpleDateFormat("mm").format(item.timeStampLong)
+        if (item.dateCheck)
+        {
+            holder.chattingDate.visibility=View.VISIBLE
+            val year=SimpleDateFormat("yyyy").format(item.timeStampLong)
+            val month=SimpleDateFormat("MM").format(item.timeStampLong)
+            val date=SimpleDateFormat("dd").format(item.timeStampLong)
+            val day=SimpleDateFormat("E").format(item.timeStampLong)
+            holder.chattingDate.text=year+"년 "+month+"월 "+date+"일 "+day+"요일"
+        }
+        else
+        {
+            holder.chattingDate.visibility=View.GONE
+        }
     }
 
     override fun getItemCount(): Int {
