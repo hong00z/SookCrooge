@@ -58,7 +58,7 @@ class OthersCalendar : AppCompatActivity() {
         var selectedMonthSpend=0
         var currentSelectedMonth=CalendarDay.today().month
 
-        val dataQuery = db.collection(otherUserUID.toString()).orderBy("date")
+        val dataQuery = db.collection("users").document(otherUserUID.toString()).collection("accountBook").orderBy("date")
         dataQuery.addSnapshotListener { snapshots, e ->
             for (dc in snapshots!!.documentChanges) {
                 when (dc.type) {
@@ -136,6 +136,17 @@ class OthersCalendar : AppCompatActivity() {
                             binding.recyclerView.adapter = adapter
                             OthersAccountAdapter(selectedMonthDatas).notifyDataSetChanged()
                         }
+
+                        (binding.recyclerView.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
+                            override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
+                                binding.smileText.text= (data.smile+1).toString()
+                                db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("smile", (data.smile+1))
+                            }
+                            override fun onAngryClick(binding: AccountListBinding, data: accountItem) {
+                                binding.angryText.text= (data.angry+1).toString()
+                                db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("angry", (data.angry+1))
+                            }
+                        })
                     }
                     DocumentChange.Type.MODIFIED -> {
                         for (i in 0..<allDatas.size) {
@@ -162,11 +173,11 @@ class OthersCalendar : AppCompatActivity() {
                         (binding.recyclerView.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
                             override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
                                 binding.smileText.text= (data.smile+1).toString()
-                                db.collection(otherUserUID.toString()).document(data.documentID).update("smile", (data.smile+1))
+                                db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("smile", (data.smile+1))
                             }
                             override fun onAngryClick(binding: AccountListBinding, data: accountItem) {
                                 binding.angryText.text= (data.angry+1).toString()
-                                db.collection(otherUserUID.toString()).document(data.documentID).update("angry", (data.angry+1))
+                                db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("angry", (data.angry+1))
                             }
                         })
                     }
@@ -240,11 +251,11 @@ class OthersCalendar : AppCompatActivity() {
                     (binding.recyclerView.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
                         override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
                             binding.smileText.text= (data.smile+1).toString()
-                            db.collection(otherUserUID.toString()).document(data.documentID).update("smile", (data.smile+1))
+                            db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("smile", (data.smile+1))
                         }
                         override fun onAngryClick(binding: AccountListBinding, data: accountItem) {
                             binding.angryText.text= (data.angry+1).toString()
-                            db.collection(otherUserUID.toString()).document(data.documentID).update("angry", (data.angry+1))
+                            db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("angry", (data.angry+1))
                         }
                     })
 

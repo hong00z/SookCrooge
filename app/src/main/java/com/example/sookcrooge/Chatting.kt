@@ -137,58 +137,62 @@ class Chatting : AppCompatActivity() {
                             today-=today%86400000
                             val todayDate=Date(today)
                             val todayTimestamp=Timestamp(todayDate)
+
+
                             db.collection("users").whereEqualTo("nickname", accountWindowUserName).get().addOnSuccessListener {
                                 val othersUserUID=it.documents[0].data?.get("uid").toString()
-                                db.collection(othersUserUID).whereGreaterThan("date", todayTimestamp).orderBy("date").get().addOnSuccessListener{documents->
-                                    if (documents.size()==0)
-                                    {
-                                        binding.noSpendOrSaveText.visibility=View.VISIBLE
-                                        binding.noSpendOrSaveText.text=accountWindowUserName+"님은" +
-                                                " 오늘의 소비/절약이 없습니다."
-                                        binding.itemRecycler.visibility=View.GONE
-
-                                    }
-                                    else
-                                    {
-                                        binding.noSpendOrSaveText.visibility=View.GONE
-                                        binding.itemRecycler.visibility=View.VISIBLE
-                                        for (document in documents)
+                                db.collection("users").document(othersUserUID).collection("accountBook").whereGreaterThan("date", todayTimestamp).orderBy("date").get()
+                                    .addOnSuccessListener {documents->
+                                        if (documents.size()==0)
                                         {
-                                            var timeStamp = document.data["date"] as com.google.firebase.Timestamp
-                                            val timeStampLong=timeStamp.seconds*1000+32400
-                                            val month= SimpleDateFormat("MM").format(timeStampLong)
-                                            val day= SimpleDateFormat("dd").format(timeStampLong)
+                                            binding.noSpendOrSaveText.visibility=View.VISIBLE
+                                            binding.noSpendOrSaveText.text=accountWindowUserName+"님은" +
+                                                    " 오늘의 소비/절약이 없습니다."
+                                            binding.itemRecycler.visibility=View.GONE
 
-                                            val newItem = accountItem(document.id, document.data["name"].toString(), document.data["cost"].toString().toInt(),
-                                                (month.toInt()-1).toString(), day, document.data["type"].toString(),
-                                                document.data["angry"].toString().toInt(), document.data["smile"].toString().toInt(), document.data["tag"].toString())
-                                            itemDatas.add(newItem)
                                         }
-                                        binding.itemRecycler.adapter = OthersAccountAdapter(itemDatas)
-                                        (binding.itemRecycler.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
-                                            override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
-                                                if (userNickname==accountWindowUserName)
-                                                {
-                                                    return
-                                                }
-                                                binding.smileText.text= (data.smile+1).toString()
-                                                db.collection(othersUserUID).document(data.documentID).update("smile", (data.smile+1))
-                                            }
-                                            override fun onAngryClick(binding: AccountListBinding, data: accountItem)
+                                        else
+                                        {
+                                            binding.noSpendOrSaveText.visibility=View.GONE
+                                            binding.itemRecycler.visibility=View.VISIBLE
+                                            for (document in documents)
                                             {
-                                                if (userNickname==accountWindowUserName)
-                                                {
-                                                    return
-                                                }
-                                                binding.angryText.text= (data.angry+1).toString()
-                                                db.collection(othersUserUID).document(data.documentID).update("angry", (data.angry+1))
+                                                var timeStamp = document.data["date"] as com.google.firebase.Timestamp
+                                                val timeStampLong=timeStamp.seconds*1000+32400
+                                                val month= SimpleDateFormat("MM").format(timeStampLong)
+                                                val day= SimpleDateFormat("dd").format(timeStampLong)
+
+                                                val newItem = accountItem(document.id, document.data["name"].toString(), document.data["cost"].toString().toInt(),
+                                                    (month.toInt()-1).toString(), day, document.data["type"].toString(),
+                                                    document.data["angry"].toString().toInt(), document.data["smile"].toString().toInt(), document.data["tag"].toString())
+                                                itemDatas.add(newItem)
                                             }
-                                        })
+                                            binding.itemRecycler.adapter = OthersAccountAdapter(itemDatas)
+                                            (binding.itemRecycler.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
+                                                override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
+                                                    if (userNickname==accountWindowUserName)
+                                                    {
+                                                        return
+                                                    }
+                                                    binding.smileText.text= (data.smile+1).toString()
+                                                    db.collection(othersUserUID).document(data.documentID).update("smile", (data.smile+1))
+                                                }
+                                                override fun onAngryClick(binding: AccountListBinding, data: accountItem)
+                                                {
+                                                    if (userNickname==accountWindowUserName)
+                                                    {
+                                                        return
+                                                    }
+                                                    binding.angryText.text= (data.angry+1).toString()
+                                                    db.collection(othersUserUID).document(data.documentID).update("angry", (data.angry+1))
+                                                }
+                                            })
+                                        }
+                                        runOnUiThread{
+                                            OthersAccountAdapter(itemDatas).notifyDataSetChanged()
+                                        }
                                     }
-                                    runOnUiThread{
-                                        OthersAccountAdapter(itemDatas).notifyDataSetChanged()
-                                    }
-                                }
+
                             }
 
 
@@ -220,7 +224,6 @@ class Chatting : AppCompatActivity() {
             db.collection("chattingRoom_shdknm1hks")
                 .add(newMessage)
             binding.userAccountWindow.visibility= View.GONE
-            //messageList.add(MessageModel(MY_MESSAGE, userNickname,binding.chattingEditText.text.toString()))
             binding.chattingEditText.setText("")
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(binding.chattingEditText.windowToken, 0)
@@ -237,6 +240,7 @@ class Chatting : AppCompatActivity() {
 
 
         binding.moveToAccount.setOnClickListener {
+
             if (userNickname==accountWindowUserName)
             {
                 val userQuery = db.collection("users").whereEqualTo("nickname", accountWindowUserName).get().addOnSuccessListener{
