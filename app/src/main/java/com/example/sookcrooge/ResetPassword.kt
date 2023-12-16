@@ -24,6 +24,7 @@ class ResetPassword : AppCompatActivity() {
     private var verificationCode = ""
     var timer = Timer()
     val db = Firebase.firestore
+    lateinit var userUID:String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -99,6 +100,7 @@ class ResetPassword : AppCompatActivity() {
         }
 
         binding.resetPWDButton.setOnClickListener{
+            var isAllQualified = true
             if (!isVerified)
             {
                 binding.resetPWDWarningNumber.visibility=View.VISIBLE
@@ -111,6 +113,7 @@ class ResetPassword : AppCompatActivity() {
             else
             {
                 binding.resetPWDWarningPassword.visibility= View.VISIBLE
+                isAllQualified=false
             }
             if (isPasswordAndPasswordConfirmSame())
             {
@@ -119,28 +122,33 @@ class ResetPassword : AppCompatActivity() {
             else
             {
                 binding.resetPWDWarningPasswordConfirm.visibility= View.VISIBLE
+                isAllQualified=false
             }
-
-            val user = Firebase.auth.currentUser
-            val newPassword = binding.resetPWDInputPassword.text.toString()
-
-            user!!.updatePassword(newPassword)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Log.d("jhs", "User password updated.")
-                    }
+            if (isAllQualified==true)
+            {
+                val newPassword = binding.resetPWDInputPassword.text.toString()
+                if (loginInformation?.loginType == loginUser.naverLogin)
+                {
+                    userUID=loginInformation.currentLoginUser!!.uid
+                }
+                else
+                {
+                    val user = Firebase.auth.currentUser
+                    userUID=user!!.uid
+                    user!!.updatePassword(newPassword)
                 }
 
-            var map= mutableMapOf<String,Any>()
-            map["password"] =newPassword
-            db.collection("users").document(user.uid).update(map)
-                .addOnCompleteListener{
-                    if(it.isSuccessful){
-                        Log.d("jhs", "업데이트됨")
-                    }
-                }
 
-            finish()
+                var map= mutableMapOf<String,Any>()
+                map["password"] =newPassword
+                db.collection("users").document(userUID).update(map)
+                    .addOnCompleteListener{
+                        if(it.isSuccessful){
+                            Log.d("jhs", "업데이트됨")
+                        }
+                    }
+                finish()
+            }
         }
 
 

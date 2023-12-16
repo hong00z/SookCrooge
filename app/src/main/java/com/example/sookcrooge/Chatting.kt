@@ -2,25 +2,16 @@ package com.example.sookcrooge
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
-import androidx.constraintlayout.motion.widget.Key.VISIBILITY
-import androidx.core.view.size
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sookcrooge.MessageModel.Companion.MY_MESSAGE
 import com.example.sookcrooge.MessageModel.Companion.OTHERS_MESSAGE
 import com.example.sookcrooge.databinding.AccountListBinding
 import com.example.sookcrooge.databinding.ActivityChattingBinding
-import com.example.sookcrooge.databinding.ChattingUsersBinding
 import com.google.firebase.Timestamp
 import com.google.firebase.Timestamp.now
 import com.google.firebase.auth.FirebaseAuth
@@ -50,9 +41,16 @@ class Chatting : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         auth=Firebase.auth
-        val user=auth.currentUser!!
-
-        val userQuery = db.collection("users").whereEqualTo("uid", user.uid).get()
+        lateinit var userUID:String
+        if (loginInformation?.loginType == loginUser.naverLogin)
+        {
+            userUID=loginInformation.currentLoginUser!!.uid
+        }
+        else
+        {
+            userUID=auth.currentUser!!.uid
+        }
+        val userQuery = db.collection("users").whereEqualTo("uid", userUID).get()
             .addOnSuccessListener{
                 it.forEach{document->
                     userNickname=document["nickname"].toString()

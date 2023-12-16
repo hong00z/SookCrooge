@@ -64,7 +64,7 @@ class OthersCalendar : AppCompatActivity() {
                 when (dc.type) {
                     DocumentChange.Type.ADDED -> {
                         var timeStamp = dc.document.data["date"] as com.google.firebase.Timestamp
-                        val timeStampLong=timeStamp.seconds*1000+32400
+                        val timeStampLong=timeStamp.seconds*1000+32400000
                         val year = SimpleDateFormat("YYYY").format(timeStampLong)
                         val month=SimpleDateFormat("MM").format(timeStampLong)
                         val day=SimpleDateFormat("dd").format(timeStampLong)
