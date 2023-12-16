@@ -1,12 +1,15 @@
 package com.example.sookcrooge
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sookcrooge.databinding.FragmentChat2Binding
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -19,6 +22,7 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class ChatFragment2 : Fragment() {
+    val db = Firebase.firestore
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -36,11 +40,28 @@ class ChatFragment2 : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val binding2 = FragmentChat2Binding.inflate(layoutInflater,container,false)
-        var chatData = mutableListOf<String>("인천 거지방","서울 거지방","채팅방3","채팅방4")
-        val layoutManager = LinearLayoutManager(activity)
-        binding2.recyclerChat2.layoutManager = layoutManager
-        val adapter = ChatAdapter(chatData)
-        binding2.recyclerChat2.adapter = adapter
+        val userName="asd123@naver.com"
+        db.collection("rooms")
+            .whereEqualTo("userName", userName)
+            .addSnapshotListener { value, e ->
+
+                if (e != null) {
+                    Log.w("CHAT", "Listen failed.", e)
+                    return@addSnapshotListener
+                }
+                val chatData = mutableListOf<String>()
+                for (doc in value!!) {
+                    doc.getString("chatName")?.let {
+                        chatData.add(it)
+                        val layoutManager = LinearLayoutManager(activity)
+                        binding2.recyclerChat2.layoutManager = layoutManager
+                        val adapter = ChatAdapter(chatData)
+                        binding2.recyclerChat2.adapter = adapter
+                    }
+
+                }
+            }
+
         return binding2.root
     }
 

@@ -13,6 +13,9 @@ import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sookcrooge.databinding.FragmentChat1Binding
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.firestore
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -25,6 +28,7 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class ChatFragment1 : Fragment() {
+    val db = Firebase.firestore
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -43,12 +47,29 @@ class ChatFragment1 : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val binding = FragmentChat1Binding.inflate(layoutInflater,container,false)
-        var chatData = mutableListOf<String>()
 
-        val layoutManager = LinearLayoutManager(activity)
-        binding.recyclerChat1.layoutManager = layoutManager
-        val adapter = ChatAdapter(chatData)
-        binding.recyclerChat1.adapter = adapter
+        db.collection("rooms")
+            .addSnapshotListener { value, e ->
+                if (e != null) {
+                    Log.w("CHAT", "Listen failed.", e)
+                    return@addSnapshotListener
+                }
+                val chatData = mutableListOf<String>()
+                for (doc in value!!) {
+                    doc.getString("chatName")?.let {
+                        chatData.add(it)
+                        val layoutManager = LinearLayoutManager(activity)
+                        binding.recyclerChat1.layoutManager = layoutManager
+                        val adapter = ChatAdapter(chatData)
+                        binding.recyclerChat1.adapter = adapter
+                    }
+                }
+
+
+
+            }
+
+
         return binding.root
     }
 

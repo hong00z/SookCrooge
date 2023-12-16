@@ -30,7 +30,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="4"
+            android:text="1"
             android:textColor="@color/user_num"/>
         <TextView
             android:layout_width="wrap_content"
@@ -40,6 +40,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/chat_max"
             android:text="5"
             android:textColor="@color/user_num"/>
 
