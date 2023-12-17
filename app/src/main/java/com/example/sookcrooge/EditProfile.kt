@@ -102,6 +102,7 @@ class EditProfile : AppCompatActivity() {
                         }
                     })
                     deleteAccountDialog.dismiss()
+                    loginInformation.logout()
                     val intent = Intent(this, InitialActivity::class.java)
                     startActivity(intent)
                 }
@@ -115,6 +116,7 @@ class EditProfile : AppCompatActivity() {
                             startActivity(intent)
                         }
                     }
+                    loginInformation.logout()
                     db.collection("users").document(loginUser.uid)
                         .delete()
                 }

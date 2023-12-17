@@ -56,7 +56,7 @@ class Chatting : AppCompatActivity() {
                     userNickname=document["nickname"].toString()
                 }
                 var prevChattingLogDate:String? = null
-                val chatting = db.collection("chattingRoom_shdknm1hks").orderBy("time")
+                val chatting = db.collection("chattingRoom_shdknm1hksakshnmzx").orderBy("time")
                 chatting.addSnapshotListener{ snapshot, e ->
                     for (document in snapshot!!.documentChanges) {
                         if (document.type == DocumentChange.Type.ADDED)
@@ -87,10 +87,10 @@ class Chatting : AppCompatActivity() {
             }
         var userAccountWindowDatas = mutableListOf<userItem>()
 
-        val chattingUsersQuery = db.collection("rooms").document("W2U5O23pUoksmknw1Kqc")
+        val chattingUsersQuery = db.collection("rooms").document("shdknm1hksakshnmzx")
         chattingUsersQuery.addSnapshotListener{snapshots, e ->
             userAccountWindowDatas.clear()
-            val chattingUsers = snapshots!!.data?.get("chatUsers").toString()
+            val chattingUsers = snapshots!!.data?.get("userName").toString()
             val st = StringTokenizer(chattingUsers, ",")
             while (st.hasMoreTokens())
             {

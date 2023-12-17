@@ -41,4 +41,10 @@ object loginInformation {
         }
 
     }
+
+    fun logout()
+    {
+        this.loginType=loginUser.logout
+        this.currentLoginUser=null
+    }
 }

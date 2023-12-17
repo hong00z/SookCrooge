@@ -67,6 +67,7 @@ class ResetPassword : AppCompatActivity() {
                         class mailSenderThread():Thread(){
                             override fun run()
                             {
+                                createVerificationCode()
                                 val receiverEmail = binding.resetPWDInputEmail.text.toString()
                                 val sender = EmailSender(receiverEmail, verificationCode)
                                 sender.sendMail()
