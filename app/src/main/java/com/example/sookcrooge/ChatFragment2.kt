@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sookcrooge.databinding.FragmentChat2Binding
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.firestore
 
 // TODO: Rename parameter arguments, choose names that match
@@ -50,16 +51,25 @@ class ChatFragment2 : Fragment() {
                     Log.w("CHAT", "Listen failed.", e)
                     return@addSnapshotListener
                 }
-                for (document in value!!.documentChanges)
-                {
-                    val currentData=Chat(document.document.data["chatName"].toString(), document.document.data["chatNum"].toString(), document.document.data["userName"].toString(),
-                        document.document.data["date"].toString())
-                    currentData.addDocumentID(document.document.data["documentID"].toString())
-                    chatData.add(currentData)
-                    val layoutManager = LinearLayoutManager(activity)
-                    binding2.recyclerChat2.layoutManager = layoutManager
-                    val adapter = ChatAdapter(chatData)
-                    binding2.recyclerChat2.adapter = adapter
+                for (dc in value!!.documentChanges) {
+                    when (dc.type) {
+                        DocumentChange.Type.ADDED -> {
+                            val currentData = Chat(
+                                dc.document.data["chatName"].toString(),
+                                dc.document.data["chatNum"].toString(),
+                                dc.document.data["userName"].toString(),
+                                dc.document.data["date"].toString()
+                            )
+                            currentData.addDocumentID(dc.document.data["documentID"].toString())
+                            chatData.add(currentData)
+                            val layoutManager = LinearLayoutManager(activity)
+                            binding2.recyclerChat2.layoutManager = layoutManager
+                            val adapter = ChatAdapter(chatData)
+                            binding2.recyclerChat2.adapter = adapter
+                        }
+
+                        else -> {}
+                    }
                 }
             }
 

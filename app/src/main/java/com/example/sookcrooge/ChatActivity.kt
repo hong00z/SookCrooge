@@ -77,23 +77,26 @@ class ChatActivity : AppCompatActivity() {
                     .create()
                 val chatName = dialogView.findViewById<EditText>(R.id.chat_name).text
                 val chatNum= dialogView.findViewById<EditText>(R.id.chat_num).text
-                val userName = "asd123@naver.com"
                 val button1 = dialogView.findViewById<Button>(R.id.positiveButton)
                 val button2 = dialogView.findViewById<Button>(R.id.cancel_button)
                 val currentDate = LocalDate.now()
 
                 button1.setOnClickListener{
                     alertDialog.dismiss()
-                    val chattingRoom=Chat(chatName.toString(),chatNum.toString(),userName,currentDate.toString())
-                    db.collection("rooms")
-                        .add(chattingRoom)
-                        .addOnSuccessListener {
-                            chattingRoom.addDocumentID(it.id)
-                            it.update("documentID", it.id).addOnSuccessListener {
-                                Log.d("TEST", "DocumentSnapshot successfully written!")
+                    db.collection("users").whereEqualTo("uid", loginInformation.currentLoginUser!!.uid).get().addOnSuccessListener {
+                        val userName = it.documents[0].get("nickname").toString()
+                        val chattingRoom=Chat(chatName.toString(),chatNum.toString(),userName,currentDate.toString())
+                        db.collection("rooms")
+                            .add(chattingRoom)
+                            .addOnSuccessListener {
+                                chattingRoom.addDocumentID(it.id)
+                                it.update("documentID", it.id).addOnSuccessListener {
+                                    Log.d("TEST", "DocumentSnapshot successfully written!")
+                                }
                             }
-                        }
-                        .addOnFailureListener { e -> Log.w("TEST", "Error writing document", e) }
+                            .addOnFailureListener { e -> Log.w("TEST", "Error writing document", e) }
+                    }
+
                 }
                 button2.setOnClickListener {
                     alertDialog.dismiss()
