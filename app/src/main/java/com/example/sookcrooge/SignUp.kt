@@ -120,7 +120,7 @@ class SignUp : AppCompatActivity() {
         var hasDigit = false
         val password = binding.registerInputPassword.text.toString()
         if (password.length < 8)
-        return false
+            return false
 
         password.forEach{
             if (it.isDigit())

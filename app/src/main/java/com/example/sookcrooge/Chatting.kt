@@ -1,5 +1,7 @@
 package com.example.sookcrooge
 
+import OthersCalendar
+import accountItem
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -7,6 +9,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sookcrooge.MessageModel.Companion.MY_MESSAGE
 import com.example.sookcrooge.MessageModel.Companion.OTHERS_MESSAGE
@@ -172,7 +175,9 @@ class Chatting : AppCompatActivity() {
                                                     {
                                                         return
                                                     }
-                                                    binding.smileText.text= (data.smile+1).toString()
+                                                    val smile = findViewById<TextView>(R.id.smileText)
+                                                    smile.text = (data.smile+1).toString()
+
                                                     db.collection(othersUserUID).document(data.documentID).update("smile", (data.smile+1))
                                                 }
                                                 override fun onAngryClick(binding: AccountListBinding, data: accountItem)
@@ -181,7 +186,8 @@ class Chatting : AppCompatActivity() {
                                                     {
                                                         return
                                                     }
-                                                    binding.angryText.text= (data.angry+1).toString()
+                                                    val angry =  findViewById<TextView>(R.id.angryText)
+                                                    angry.text= (data.angry+1).toString()
                                                     db.collection(othersUserUID).document(data.documentID).update("angry", (data.angry+1))
                                                 }
                                             })

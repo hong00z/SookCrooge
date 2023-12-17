@@ -1,4 +1,5 @@
-package com.example.sookcrooge
+import com.example.sookcrooge.OthersAccountAdapter
+import com.example.sookcrooge.R
 
 import android.content.Context
 import android.graphics.Canvas
@@ -11,6 +12,7 @@ import android.text.style.LineBackgroundSpan
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -44,9 +46,10 @@ class OthersCalendar : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         auth= Firebase.auth
 
+        val smileText = findViewById<TextView>(R.id.smileText)
+        val angryText = findViewById<TextView>(R.id.angryText)
         val intent= intent
         val otherUserUID=intent.getStringExtra("uid")
         binding.toolbar.title=intent.getStringExtra("nickname")+"의 가계부"
@@ -54,7 +57,7 @@ class OthersCalendar : AppCompatActivity() {
         val decoratorList= mutableListOf<calendarDates>()
         val allDatas = mutableListOf<accountItem>()
         val selectedMonthDatas=mutableListOf<accountItem>()
-        var adapter=OthersAccountAdapter(selectedMonthDatas)
+        var adapter= OthersAccountAdapter(selectedMonthDatas)
         var selectedMonthSpend=0
         var currentSelectedMonth=CalendarDay.today().month
 
@@ -139,11 +142,11 @@ class OthersCalendar : AppCompatActivity() {
 
                         (binding.recyclerView.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
                             override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
-                                binding.smileText.text= (data.smile+1).toString()
+                                smileText.text= (data.smile+1).toString()
                                 db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("smile", (data.smile+1))
                             }
                             override fun onAngryClick(binding: AccountListBinding, data: accountItem) {
-                                binding.angryText.text= (data.angry+1).toString()
+                                angryText.text= (data.angry+1).toString()
                                 db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("angry", (data.angry+1))
                             }
                         })
@@ -172,11 +175,11 @@ class OthersCalendar : AppCompatActivity() {
                         }
                         (binding.recyclerView.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
                             override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
-                                binding.smileText.text= (data.smile+1).toString()
+                                smileText.text= (data.smile+1).toString()
                                 db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("smile", (data.smile+1))
                             }
                             override fun onAngryClick(binding: AccountListBinding, data: accountItem) {
-                                binding.angryText.text= (data.angry+1).toString()
+                                angryText.text= (data.angry+1).toString()
                                 db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("angry", (data.angry+1))
                             }
                         })
@@ -192,8 +195,10 @@ class OthersCalendar : AppCompatActivity() {
         binding.othersMaterialCalendar.setWeekDayTextAppearance(R.style.CustomWeekDayAppearance)
         binding.othersMaterialCalendar.setHeaderTextAppearance(R.style.CustomHeaderTextAppearance)
 
-        binding.othersMaterialCalendar.setTitleFormatter(MonthArrayTitleFormatter(resources.getTextArray(R.array.custom_months)))
-        binding.othersMaterialCalendar.setWeekDayFormatter(ArrayWeekDayFormatter(resources.getTextArray(R.array.custom_weekdays)))
+        binding.othersMaterialCalendar.setTitleFormatter(MonthArrayTitleFormatter(resources.getTextArray(
+            R.array.custom_months)))
+        binding.othersMaterialCalendar.setWeekDayFormatter(ArrayWeekDayFormatter(resources.getTextArray(
+            R.array.custom_weekdays)))
 
         var selectedDate: CalendarDay = CalendarDay.today()
 
@@ -250,11 +255,11 @@ class OthersCalendar : AppCompatActivity() {
                     binding.totalMonthSpend.text=selectedMonthSpend.toString()
                     (binding.recyclerView.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
                         override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
-                            binding.smileText.text= (data.smile+1).toString()
+                            smileText.text= (data.smile+1).toString()
                             db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("smile", (data.smile+1))
                         }
                         override fun onAngryClick(binding: AccountListBinding, data: accountItem) {
-                            binding.angryText.text= (data.angry+1).toString()
+                            angryText.text= (data.angry+1).toString()
                             db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("angry", (data.angry+1))
                         }
                     })
@@ -286,7 +291,7 @@ class OthersCalendar : AppCompatActivity() {
             return day?.equals(date)!!
         }
         override fun decorate(view: DayViewFacade?) {
-//view?.addSpan(ForegroundColorSpan(Color.parseColor("#34A94B")))
+            view?.addSpan(ForegroundColorSpan(Color.parseColor("#34A94B")))
             if(drawable != null) {
                 view?.setSelectionDrawable(drawable)
             }
