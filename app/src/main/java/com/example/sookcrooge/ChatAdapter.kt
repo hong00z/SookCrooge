@@ -55,6 +55,7 @@ class ChatAdapter (val datas: MutableList<Chat>) :
                         }
                         for (document in snapshots!!.documentChanges) {
                             if (document.type == DocumentChange.Type.ADDED || document.type == DocumentChange.Type.MODIFIED) {
+
                                 db.collection("rooms").document(document.document.id).delete()
                             }
                         }
