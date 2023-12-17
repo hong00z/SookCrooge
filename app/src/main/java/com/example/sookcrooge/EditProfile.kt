@@ -1,12 +1,12 @@
 package com.example.sookcrooge
 
 import android.app.ProgressDialog.show
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.example.sookcrooge.databinding.ActivityEditProfileBinding
 import com.example.sookcrooge.databinding.DeleteAccountDialogBinding
@@ -15,11 +15,8 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import com.navercorp.nid.oauth.NidOAuthLogin
+import com.navercorp.nid.oauth.OAuthLoginCallback
 
 class EditProfile : AppCompatActivity() {
     val binding: ActivityEditProfileBinding by lazy {
@@ -34,6 +31,7 @@ class EditProfile : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var userPassword:String
+    lateinit var userUID:String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -42,9 +40,15 @@ class EditProfile : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         auth = Firebase.auth
-        val user = Firebase.auth.currentUser!!
-
-        val docRef = db.collection("users").document(user.uid)
+        if (loginInformation?.loginType == loginUser.naverLogin)
+        {
+            userUID=loginInformation.currentLoginUser!!.uid
+        }
+        else
+        {
+            userUID=auth.currentUser!!.uid
+        }
+        val docRef = db.collection("users").document(userUID)
         docRef.get().addOnSuccessListener{document->
             if (document != null)
             {
@@ -63,9 +67,7 @@ class EditProfile : AppCompatActivity() {
                 var map= mutableMapOf<String,Any>()
                 map["name"] = name
                 map["nickname"] = nickname
-                if (user != null) {
-                    db.collection("users").document(user.uid).update(map)
-                }
+                db.collection("users").document(userUID).update(map)
                 finish()
             }
 
@@ -84,14 +86,41 @@ class EditProfile : AppCompatActivity() {
                 deleteAccountDialog.dismiss()
             }
             dialogBinding.deleteAccountYes.setOnClickListener {
-                val loginUser = Firebase.auth.currentUser!!
-                loginUser.delete().addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        deleteAccountDialog.dismiss()
-                    }
+
+                if (loginInformation.loginType==loginUser.naverLogin)
+                {
+                    NidOAuthLogin().callDeleteTokenApi(object : OAuthLoginCallback {
+                        override fun onError(errorCode: Int, message: String) {
+                        }
+
+                        override fun onFailure(httpStatus: Int, message: String) {
+                        }
+
+                        override fun onSuccess() {
+                            db.collection("users").document(loginInformation.currentLoginUser!!.uid)
+                                .delete()
+                        }
+                    })
+                    deleteAccountDialog.dismiss()
+                    loginInformation.logout()
+                    val intent = Intent(this, InitialActivity::class.java)
+                    startActivity(intent)
                 }
-                db.collection("users").document(loginUser.uid)
-                    .delete()
+                else
+                {
+                    val loginUser = Firebase.auth.currentUser!!
+                    loginUser.delete().addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            deleteAccountDialog.dismiss()
+                            val intent = Intent(this, InitialActivity::class.java)
+                            startActivity(intent)
+                        }
+                    }
+                    loginInformation.logout()
+                    db.collection("users").document(loginUser.uid)
+                        .delete()
+                }
+
 
             }
         }
@@ -106,7 +135,6 @@ class EditProfile : AppCompatActivity() {
         password = binding.editInputPassword.text.toString()
         var b:Boolean = true
 
-        val user=Firebase.auth.currentUser!!
         val task = db.collection("users")
             .whereEqualTo("nickname", nickname).get().addOnSuccessListener { documents ->
                 if (documents.size()==0)
@@ -116,7 +144,7 @@ class EditProfile : AppCompatActivity() {
                 else if (documents.size()==1)
                 {
                     for (document in documents) {
-                        if (document.id == user.uid)
+                        if (document.id == userUID)
                         {
                             binding.editWarningNickname.visibility= View.INVISIBLE
                         }
@@ -156,21 +184,4 @@ class EditProfile : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private suspend fun getResultFromDB (field: String, findItem: String) = suspendCoroutine<Boolean> { continuation ->
-        val task = db.collection("users")
-            .whereEqualTo(field, findItem)
-            .get().addOnCompleteListener {
-                if (it.isSuccessful) {
-                    if (it.result.size()==0)
-                    {
-                        continuation.resume(false)
-                    }
-                    else
-                    {
-                        continuation.resume(true)
-                    }
-
-                }
-            }
-    }
 }
