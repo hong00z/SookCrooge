@@ -5,20 +5,35 @@
     android:layout_width="match_parent"
     android:background="@color/white"
     android:layout_height="match_parent">
+    <com.google.android.material.appbar.AppBarLayout
+        style="@style/Widget.MaterialComponents.Toolbar.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:titleTextColor="@color/white"
+            app:title="가계부"/>
+    </com.google.android.material.appbar.AppBarLayout>
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
-        android:padding="10dp"
         android:id="@+id/materialCalendar"
         app:mcv_selectionColor="@color/main_green"
         android:layout_width="wrap_content"
         android:layout_gravity="center"
-        android:layout_height="430dp"
+        android:layout_height="380dp"
+        android:layout_marginTop="10dp"
         />
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_gravity="right"
-        android:layout_marginTop="-30dp"
+        android:layout_marginTop="-10dp"
         android:layout_marginRight="30dp">
         <TextView
             android:id="@+id/total_month"
@@ -39,12 +54,33 @@
             android:text="원"/>
     </LinearLayout>
 
+<RelativeLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:layout_gravity="center">
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floating_action_button"
+        style="@style/Widget.Design.FloatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:padding="5dp"
-        android:id="@+id/recycler_view">
-    </androidx.recyclerview.widget.RecyclerView>
+        android:layout_alignParentEnd="true"
+        android:layout_alignBottom="@id/recycler_view"
+        android:layout_gravity="end"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="25dp"
+        android:backgroundTint="@color/main_green"
+        android:contentDescription="TODO"
+        app:srcCompat="@drawable/ic_add"
+        app:tint="#FFFFFF" />
+</RelativeLayout>
+
+
 
 </LinearLayout>
