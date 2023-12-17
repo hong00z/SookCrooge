@@ -55,19 +55,25 @@ class ChatRoomActivity : AppCompatActivity() {
                     .create()
                 val chatName = dialogView.findViewById<EditText>(R.id.chat_name).text
                 val chatNum= dialogView.findViewById<EditText>(R.id.chat_num).text
-                val userName = "asd123@naver.com"
+
                 val button1 = dialogView.findViewById<Button>(R.id.positiveButton)
                 val button2 = dialogView.findViewById<Button>(R.id.cancel_button)
 
                 button1.setOnClickListener{
-                    fbdb.collection("rooms").document().set(Chat(chatName.toString(),chatNum.toString(),userName,"10.23"))
-                        .addOnSuccessListener {
-                            Toast.makeText(this,"채팅방 개설 성공", Toast.LENGTH_SHORT).show()
-                        }
-                        .addOnFailureListener {
-                            Toast.makeText(this,"채팅방 개설 실패", Toast.LENGTH_SHORT).show()
-                        }
-                    alertDialog.dismiss()
+                    Log.d("jhs", "test")
+                    fbdb.collection("users").whereEqualTo("uid", loginInformation.currentLoginUser!!.uid).get().addOnSuccessListener{
+                        val userName=it.documents[0].get("nickname").toString()
+                        Log.d("jhs", userName)
+                        fbdb.collection("rooms").document().set(Chat(chatName.toString(),chatNum.toString(),userName,"10.23"))
+                            .addOnSuccessListener {
+                                Toast.makeText(this,"채팅방 개설 성공", Toast.LENGTH_SHORT).show()
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(this,"채팅방 개설 실패", Toast.LENGTH_SHORT).show()
+                            }
+                        alertDialog.dismiss()
+                    }
+
                 }
                 button2.setOnClickListener {
                     alertDialog.dismiss()

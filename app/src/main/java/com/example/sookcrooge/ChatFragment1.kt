@@ -47,26 +47,32 @@ class ChatFragment1 : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val binding = FragmentChat1Binding.inflate(layoutInflater,container,false)
-
+        val chatData = mutableListOf<Chat>()
         db.collection("rooms")
             .addSnapshotListener { value, e ->
                 if (e != null) {
                     Log.w("CHAT", "Listen failed.", e)
                     return@addSnapshotListener
                 }
-                val chatData = mutableListOf<Chat>()
-                for (document in value!!.documentChanges)
-                {
-                    val currentData=Chat(document.document.data["chatName"].toString(), document.document.data["chatNum"].toString(), document.document.data["userName"].toString(),
-                        document.document.data["date"].toString())
-                    currentData.addDocumentID(document.document.data["documentID"].toString())
-                    chatData.add(currentData)
-                    val layoutManager = LinearLayoutManager(activity)
-                    binding.recyclerChat1.layoutManager = layoutManager
-                    val adapter = ChatAdapter(chatData)
-                    binding.recyclerChat1.adapter = adapter
+                    for (dc in value!!.documentChanges) {
+                        when (dc.type) {
+                            DocumentChange.Type.ADDED -> {
+                                val currentData = Chat(
+                                    dc.document.data["chatName"].toString(),
+                                    dc.document.data["chatNum"].toString(),
+                                    dc.document.data["userName"].toString(),
+                                    dc.document.data["date"].toString()
+                                )
+                                currentData.addDocumentID(dc.document.data["documentID"].toString())
+                                chatData.add(currentData)
+                                val layoutManager = LinearLayoutManager(activity)
+                                binding.recyclerChat1.layoutManager = layoutManager
+                                val adapter = ChatAdapter(chatData)
+                                binding.recyclerChat1.adapter = adapter
+                            }
+                            else -> {}
+                        }
                 }
-
 
             }
 

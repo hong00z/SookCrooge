@@ -27,23 +27,6 @@
             android:textSize="17sp"
             android:text="할인 정보방"/>
 
-        <TextView
-            android:id="@+id/chat_num"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1"
-            android:textColor="@color/user_num"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="/"
-            android:textColor="@color/user_num"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/chat_max"
-            android:text="5"
-            android:textColor="@color/user_num"/>
 
     </LinearLayout>
     <TextView
