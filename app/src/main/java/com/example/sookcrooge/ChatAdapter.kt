@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.sookcrooge.databinding.ChatRecyclerBinding
 import com.google.firebase.firestore.DocumentChange
@@ -15,7 +16,7 @@ import com.google.firebase.ktx.Firebase
 
 
 class ChatViewHolder(val binding: ChatRecyclerBinding) : RecyclerView.ViewHolder(binding.root)
-class ChatAdapter (val datas: MutableList<String>) :
+class ChatAdapter (val datas: MutableList<Chat>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     val db = Firebase.firestore
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
@@ -27,10 +28,13 @@ class ChatAdapter (val datas: MutableList<String>) :
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val binding = (holder as ChatViewHolder).binding
-        binding.chatName.text = datas[position]
+        binding.chatName.text = datas[position].chatName
         holder.itemView.setOnClickListener {
-            val intent = Intent(holder.itemView.context,MainActivity::class.java)
-            ContextCompat.startActivity(holder.itemView.context,intent,null)
+            Log.d("jhs", datas[position].documentID)
+            val intent = Intent(holder.itemView.context,Chatting::class.java)
+            intent.putExtra("documentID", datas[position].documentID)
+            intent.putExtra("chatName", datas[position].chatName)
+            startActivity(holder.itemView.context,intent,null)
         }
         holder.itemView.setOnLongClickListener {
 

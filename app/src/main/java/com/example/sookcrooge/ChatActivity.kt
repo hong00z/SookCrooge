@@ -84,9 +84,15 @@ class ChatActivity : AppCompatActivity() {
 
                 button1.setOnClickListener{
                     alertDialog.dismiss()
-                    db.collection("rooms").document()
-                        .set(Chat(chatName.toString(),chatNum.toString(),userName,currentDate.toString()))
-                        .addOnSuccessListener { Log.d("TEST", "DocumentSnapshot successfully written!") }
+                    val chattingRoom=Chat(chatName.toString(),chatNum.toString(),userName,currentDate.toString())
+                    db.collection("rooms")
+                        .add(chattingRoom)
+                        .addOnSuccessListener {
+                            chattingRoom.addDocumentID(it.id)
+                            it.update("documentID", it.id).addOnSuccessListener {
+                                Log.d("TEST", "DocumentSnapshot successfully written!")
+                            }
+                        }
                         .addOnFailureListener { e -> Log.w("TEST", "Error writing document", e) }
                 }
                 button2.setOnClickListener {

@@ -54,17 +54,18 @@ class ChatFragment1 : Fragment() {
                     Log.w("CHAT", "Listen failed.", e)
                     return@addSnapshotListener
                 }
-                val chatData = mutableListOf<String>()
-                for (doc in value!!) {
-                    doc.getString("chatName")?.let {
-                        chatData.add(it)
-                        val layoutManager = LinearLayoutManager(activity)
-                        binding.recyclerChat1.layoutManager = layoutManager
-                        val adapter = ChatAdapter(chatData)
-                        binding.recyclerChat1.adapter = adapter
-                    }
+                val chatData = mutableListOf<Chat>()
+                for (document in value!!.documentChanges)
+                {
+                    val currentData=Chat(document.document.data["chatName"].toString(), document.document.data["chatNum"].toString(), document.document.data["userName"].toString(),
+                        document.document.data["date"].toString())
+                    currentData.addDocumentID(document.document.data["documentID"].toString())
+                    chatData.add(currentData)
+                    val layoutManager = LinearLayoutManager(activity)
+                    binding.recyclerChat1.layoutManager = layoutManager
+                    val adapter = ChatAdapter(chatData)
+                    binding.recyclerChat1.adapter = adapter
                 }
-
 
 
             }

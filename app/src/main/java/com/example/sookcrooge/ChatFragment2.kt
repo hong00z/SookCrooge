@@ -41,6 +41,7 @@ class ChatFragment2 : Fragment() {
     ): View? {
         val binding2 = FragmentChat2Binding.inflate(layoutInflater,container,false)
         val userName="asd123@naver.com"
+        val chatData = mutableListOf<Chat>()
         db.collection("rooms")
             .whereEqualTo("userName", userName)
             .addSnapshotListener { value, e ->
@@ -49,16 +50,16 @@ class ChatFragment2 : Fragment() {
                     Log.w("CHAT", "Listen failed.", e)
                     return@addSnapshotListener
                 }
-                val chatData = mutableListOf<String>()
-                for (doc in value!!) {
-                    doc.getString("chatName")?.let {
-                        chatData.add(it)
-                        val layoutManager = LinearLayoutManager(activity)
-                        binding2.recyclerChat2.layoutManager = layoutManager
-                        val adapter = ChatAdapter(chatData)
-                        binding2.recyclerChat2.adapter = adapter
-                    }
-
+                for (document in value!!.documentChanges)
+                {
+                    val currentData=Chat(document.document.data["chatName"].toString(), document.document.data["chatNum"].toString(), document.document.data["userName"].toString(),
+                        document.document.data["date"].toString())
+                    currentData.addDocumentID(document.document.data["documentID"].toString())
+                    chatData.add(currentData)
+                    val layoutManager = LinearLayoutManager(activity)
+                    binding2.recyclerChat2.layoutManager = layoutManager
+                    val adapter = ChatAdapter(chatData)
+                    binding2.recyclerChat2.adapter = adapter
                 }
             }
 

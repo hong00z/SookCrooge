@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -22,7 +23,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.jakewharton.threetenabp.AndroidThreeTen
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.StringTokenizer
@@ -36,13 +36,14 @@ class Chatting : AppCompatActivity() {
     private var accountWindowUserName:String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AndroidThreeTen.init(this)
         val binding=ActivityChattingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
+        val intent= intent
+        val documentID=intent.getStringExtra("documentID").toString()
+        binding.toolbar.title=intent.getStringExtra("chatName").toString()
         auth=Firebase.auth
         lateinit var userUID:String
         if (loginInformation?.loginType == loginUser.naverLogin)
@@ -59,7 +60,7 @@ class Chatting : AppCompatActivity() {
                     userNickname=document["nickname"].toString()
                 }
                 var prevChattingLogDate:String? = null
-                val chatting = db.collection("chattingRoom_shdknm1hksakshnmzx").orderBy("time")
+                val chatting = db.collection("chattingRoom_"+documentID).orderBy("time")
                 chatting.addSnapshotListener{ snapshot, e ->
                     for (document in snapshot!!.documentChanges) {
                         if (document.type == DocumentChange.Type.ADDED)
@@ -90,14 +91,20 @@ class Chatting : AppCompatActivity() {
             }
         var userAccountWindowDatas = mutableListOf<userItem>()
 
-        val chattingUsersQuery = db.collection("rooms").document("shdknm1hksakshnmzx")
+        val chattingUsersQuery = db.collection("rooms").document(documentID)
         chattingUsersQuery.addSnapshotListener{snapshots, e ->
             userAccountWindowDatas.clear()
             val chattingUsers = snapshots!!.data?.get("userName").toString()
+            Log.d("jhs", "aaa" + documentID)
             val st = StringTokenizer(chattingUsers, ",")
             while (st.hasMoreTokens())
             {
                 val nickname=st.nextToken()
+                if (nickname=="null")
+                {
+
+                }
+                Log.d("jhs",  nickname)
                 db.collection("users").whereEqualTo("nickname", nickname).get().addOnSuccessListener{
                     val photoURL=it.documents[0].data?.get("photoURL").toString()
                     if (photoURL=="null")
@@ -142,7 +149,7 @@ class Chatting : AppCompatActivity() {
 
                             db.collection("users").whereEqualTo("nickname", accountWindowUserName).get().addOnSuccessListener {
                                 val othersUserUID=it.documents[0].data?.get("uid").toString()
-                                db.collection("users").document(othersUserUID).collection("accountBook").whereGreaterThan("date", todayTimestamp).orderBy("date").get()
+                                db.collection("users").document(othersUserUID).collection("accountBook").whereGreaterThanOrEqualTo("date", todayTimestamp).orderBy("date").get()
                                     .addOnSuccessListener {documents->
                                         if (documents.size()==0)
                                         {
