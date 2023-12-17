@@ -28,6 +28,7 @@
             android:text="할인 정보방"/>
 
         <TextView
+            android:id="@+id/chat_num"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1"

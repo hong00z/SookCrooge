@@ -44,7 +44,9 @@ class Chatting : AppCompatActivity() {
         val intent= intent
         val documentID=intent.getStringExtra("documentID").toString()
         binding.toolbar.title=intent.getStringExtra("chatName").toString()
+
         auth=Firebase.auth
+        auth.signInWithEmailAndPassword("rabbit4935@gmail.com", "qwerty1234")
         lateinit var userUID:String
         if (loginInformation?.loginType == loginUser.naverLogin)
         {
@@ -157,7 +159,6 @@ class Chatting : AppCompatActivity() {
                                             binding.noSpendOrSaveText.text=accountWindowUserName+"님은" +
                                                     " 오늘의 소비/절약이 없습니다."
                                             binding.itemRecycler.visibility=View.GONE
-
                                         }
                                         else
                                         {

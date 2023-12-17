@@ -30,7 +30,7 @@ class ChatAdapter (val datas: MutableList<Chat>) :
         val binding = (holder as ChatViewHolder).binding
         binding.chatName.text = datas[position].chatName
         holder.itemView.setOnClickListener {
-            Log.d("jhs", datas[position].documentID)
+            datas[position].documentID?.let { it1 -> Log.d("jhs", it1) }
             val intent = Intent(holder.itemView.context,Chatting::class.java)
             intent.putExtra("documentID", datas[position].documentID)
             intent.putExtra("chatName", datas[position].chatName)
