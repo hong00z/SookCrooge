@@ -1,7 +1,5 @@
 package com.example.sookcrooge
 
-import OthersCalendar
-import accountItem
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
