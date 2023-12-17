@@ -7,4 +7,9 @@ data class Chat(var chatName: String,var chatNum: String, var userName: String,v
     {
         this.documentID = documentID
     }
+
+    constructor(chatName:String, chatNum:String, userName:String, date:String, documentID:String) : this(chatName, chatNum, userName, date) {
+        this.documentID=documentID
+    }
+
 }

@@ -82,19 +82,19 @@ class ChatActivity : AppCompatActivity() {
                 val currentDate = LocalDate.now()
 
                 button1.setOnClickListener{
-                    alertDialog.dismiss()
+
                     db.collection("users").whereEqualTo("uid", loginInformation.currentLoginUser!!.uid).get().addOnSuccessListener {
                         val userName = it.documents[0].get("nickname").toString()
-                        val chattingRoom=Chat(chatName.toString(),chatNum.toString(),userName,currentDate.toString())
-                        db.collection("rooms")
-                            .add(chattingRoom)
-                            .addOnSuccessListener {
-                                chattingRoom.addDocumentID(it.id)
-                                it.update("documentID", it.id).addOnSuccessListener {
+                        val documentID=makeDocumentCode()
+                        val chattingRoom=Chat(chatName.toString(),chatNum.toString(),userName,currentDate.toString(), documentID)
+                        db.collection("rooms").document(documentID).set(chattingRoom).addOnSuccessListener {
+
+                                    Log.d("jhs", chattingRoom.documentID.toString())
                                     Log.d("TEST", "DocumentSnapshot successfully written!")
+                                    alertDialog.dismiss()
                                 }
-                            }
-                            .addOnFailureListener { e -> Log.w("TEST", "Error writing document", e) }
+                            .addOnFailureListener { e -> Log.w("TEST", "Error writing document", e)
+                                alertDialog.dismiss()}
                     }
 
                 }
@@ -114,7 +114,20 @@ class ChatActivity : AppCompatActivity() {
     }
 
 
-
+    private fun makeDocumentCode():String
+    {
+        var verificationCode=""
+        val str = arrayOf("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
+            "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+            "1", "2", "3", "4", "5", "6", "7", "8", "9")
+        val range=(0..str.size-1)
+        for (x in 0..19) {
+            val random = range.random()
+            verificationCode += str[random]
+        }
+        return verificationCode
+    }
 
 
 }
+

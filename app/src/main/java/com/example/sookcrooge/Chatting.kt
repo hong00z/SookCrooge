@@ -42,9 +42,7 @@ class Chatting : AppCompatActivity() {
         val intent= intent
         val documentID=intent.getStringExtra("documentID").toString()
         binding.toolbar.title=intent.getStringExtra("chatName").toString()
-
         auth=Firebase.auth
-        auth.signInWithEmailAndPassword("rabbit4935@gmail.com", "qwerty1234")
         lateinit var userUID:String
         if (loginInformation?.loginType == loginUser.naverLogin)
         {
@@ -92,19 +90,16 @@ class Chatting : AppCompatActivity() {
         var userAccountWindowDatas = mutableListOf<userItem>()
 
         val chattingUsersQuery = db.collection("rooms").document(documentID)
-        chattingUsersQuery.addSnapshotListener{snapshots, e ->
+        chattingUsersQuery.addSnapshotListener{snapshot, e ->
             userAccountWindowDatas.clear()
-            val chattingUsers = snapshots!!.data?.get("userName").toString()
-            Log.d("jhs", "aaa" + documentID)
+            runOnUiThread{
+                usersAdapter(this, userAccountWindowDatas).notifyDataSetChanged()
+            }
+            val chattingUsers = snapshot!!.data?.get("userName").toString()
             val st = StringTokenizer(chattingUsers, ",")
             while (st.hasMoreTokens())
             {
                 val nickname=st.nextToken()
-                if (nickname=="null")
-                {
-
-                }
-                Log.d("jhs",  nickname)
                 db.collection("users").whereEqualTo("nickname", nickname).get().addOnSuccessListener{
                     val photoURL=it.documents[0].data?.get("photoURL").toString()
                     if (photoURL=="null")
@@ -164,7 +159,7 @@ class Chatting : AppCompatActivity() {
                                             binding.itemRecycler.visibility=View.VISIBLE
                                             for (document in documents)
                                             {
-                                                var timeStamp = document.data["date"] as com.google.firebase.Timestamp
+                                                var timeStamp = document.data["date"] as Timestamp
                                                 val timeStampLong=timeStamp.seconds*1000+32400
                                                 val month= SimpleDateFormat("MM").format(timeStampLong)
                                                 val day= SimpleDateFormat("dd").format(timeStampLong)

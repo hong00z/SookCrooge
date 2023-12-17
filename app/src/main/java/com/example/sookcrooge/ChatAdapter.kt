@@ -32,6 +32,15 @@ class ChatAdapter (val datas: MutableList<Chat>) :
         holder.itemView.setOnClickListener {
             datas[position].documentID?.let { it1 -> Log.d("jhs", it1) }
             val intent = Intent(holder.itemView.context,Chatting::class.java)
+            val temp = db.collection("rooms").whereEqualTo("documentID", datas[position].documentID).get().addOnSuccessListener{
+                val userNames=it.documents[0].data?.get("userName").toString()
+                if (!userNames.contains(loginInformation.currentLoginUser!!.nickname.toString()))
+                {
+                    Log.d("jhs", userNames)
+                    val newUserName=userNames+","+loginInformation.currentLoginUser!!.nickname.toString()
+                    datas[position].documentID?.let { it1 -> db.collection("rooms").document(it1).update("userName", newUserName) }
+                }
+            }
             intent.putExtra("documentID", datas[position].documentID)
             intent.putExtra("chatName", datas[position].chatName)
             startActivity(holder.itemView.context,intent,null)
