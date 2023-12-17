@@ -3,14 +3,23 @@ package com.example.sookcrooge
 
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.text.style.ForegroundColorSpan
 import android.util.Log
+import android.view.MenuItem
+import android.widget.Button
+import android.widget.EditText
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sookcrooge.databinding.MyAccountBookBinding
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.CalendarMode
 import com.prolificinteractive.materialcalendarview.DayViewDecorator
@@ -25,9 +34,13 @@ import java.util.Calendar
 class CalendarActivity :AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val db = Firebase.firestore
+        var cal_datas: MutableList<String>? = null
         var binding = MyAccountBookBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.materialCalendar.setDateTextAppearance(R.style.CustomDateTextAppearance)
         binding.materialCalendar.setWeekDayTextAppearance(R.style.CustomWeekDayAppearance)
         binding.materialCalendar.setHeaderTextAppearance(R.style.CustomHeaderTextAppearance)
@@ -77,13 +90,52 @@ class CalendarActivity :AppCompatActivity() {
 
             }
         })
-        var datas = mutableListOf<String>("사과","라임","레몬","수박")
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        binding.recyclerView.adapter = AccountAdapter(datas)
 
-        binding.recyclerView.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
+        db.collection("accounts")
+            .addSnapshotListener { value, e ->
+
+                if (e != null) {
+                    Log.w("Calender", "Listen failed.", e)
+                    return@addSnapshotListener
+                }
+                val c_datas = mutableListOf<String>()
+                val p_datas = mutableListOf<String>()
+                val t_datas = mutableListOf<String>()
+                val m_datas = mutableListOf<String>()
+                val d_datas = mutableListOf<String>()
+                for (doc in value!!) {
+                    doc.getString("memo")?.let {
+                        m_datas.add(it)
+                    }
+                    doc.getString("price")?.let{
+                        p_datas.add(it)
+                    }
+                    doc.getString("category")?.let{
+                        c_datas.add(it)
+                    }
+                    doc.getString("type")?.let{
+                        t_datas.add(it)
+                    }
+                    doc.getString("date")?.let{
+                        d_datas.add(it)
+                    }
+                    binding.recyclerView.layoutManager = LinearLayoutManager(this)
+                    binding.recyclerView.adapter = AccountAdapter(m_datas,p_datas)
+                    binding.recyclerView.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
+                }
+            }
+
+
+
+
+        //floating action
+        binding.floatingActionButton.setOnClickListener{
+            val intent = Intent(this, AddCalendar::class.java)
+            startActivity(intent)
+        }
 
     }
+
 
 
     class TodayDecorator(context: Context): DayViewDecorator {
@@ -117,9 +169,22 @@ class CalendarActivity :AppCompatActivity() {
             view?.setDaysDisabled(true)
         }
     }
-
-
-
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            // 뒤로가기
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+            else -> {}
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
 }
+
+
+
+
+
 
