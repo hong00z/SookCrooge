@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@color/white"
     android:layout_gravity="center|top"
-    android:padding="5dp"
-    android:layout_marginBottom="10dp"
-    android:layout_marginLeft="20dp"
-    android:layout_marginRight="20dp"
-
     android:orientation="vertical">
     <LinearLayout
         android:layout_width="wrap_content"
@@ -34,10 +29,12 @@
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        app:layout_constraintStart_toStartOf="@+id/list_day"
+        app:layout_constraintTop_toTopOf="@+id/list_day">
 
         <ImageView
             android:id="@+id/tag_img"
@@ -45,16 +42,13 @@
             android:layout_height="50dp"
             android:layout_marginLeft="10dp"
             android:layout_marginBottom="10dp"
-            android:layout_marginStart="10dp"
             android:src="@drawable/etc_icon" />
         <LinearLayout
-            android:layout_width="180dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
-            android:gravity="center|left"
             android:layout_gravity="center"
-            android:orientation="vertical"
-            tools:ignore="RtlHardcoded">
+            android:orientation="vertical">
             <TextView
                 android:layout_width="170dp"
                 android:layout_height="wrap_content"
@@ -71,22 +65,21 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginEnd="25dp"
-            android:layout_gravity="center">
+            android:layout_gravity="center"
+            android:layout_marginRight="20dp"
+            android:orientation="vertical">
             <Button
                 android:id="@+id/smileIcon"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:background="@drawable/smile_icon"/>
             <TextView
                 android:id="@+id/smileText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="13sp"
+                android:textSize="9sp"
                 android:text="0"/>
-
         </LinearLayout>
 
         <LinearLayout
@@ -96,15 +89,17 @@
             android:orientation="vertical">
             <Button
                 android:id="@+id/angryIcon"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:background="@drawable/angry_icon" />
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/angry_icon"
+                />
             <TextView
                 android:id="@+id/angryText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="13sp"
+                android:textSize="9sp"
                 android:text="0"/>
         </LinearLayout>
 

@@ -1,6 +1,5 @@
 package com.example.sookcrooge
 
-import accountItem
 import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater

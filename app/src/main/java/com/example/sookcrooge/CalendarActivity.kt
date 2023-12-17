@@ -1,8 +1,5 @@
 package com.example.sookcrooge
 
-
-
-import accountItem
 import android.content.Context
 import android.content.Intent
 import android.graphics.Canvas
@@ -23,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import calendarDates
 import com.example.sookcrooge.databinding.AccountListBinding
 import com.example.sookcrooge.databinding.MyAccountBookBinding
 import com.google.firebase.Firebase

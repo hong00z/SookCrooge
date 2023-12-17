@@ -1,3 +1,8 @@
+package com.example.sookcrooge
+
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+
 import com.example.sookcrooge.OthersAccountAdapter
 import com.example.sookcrooge.R
 
@@ -5,7 +10,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.os.Bundle
 import android.provider.SyncStateContract.Helpers.update
 import android.text.style.ForegroundColorSpan
 import android.text.style.LineBackgroundSpan
@@ -13,7 +17,6 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
