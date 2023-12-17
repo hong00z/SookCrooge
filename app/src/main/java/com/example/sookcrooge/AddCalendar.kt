@@ -43,7 +43,9 @@ class AddCalendar : AppCompatActivity() {
         var calendar_start = Calendar.getInstance()
         val userName="asd123@naver.com"
         var calendar_end = Calendar.getInstance()
-        lateinit var dateText: String
+        lateinit var dateText_y: String
+        lateinit var dateText_m: String
+        lateinit var dateText_d: String
         val today = Calendar.getInstance()
         val year1 = today.get(Calendar.YEAR)
         val month2 = today.get(Calendar.MONTH)
@@ -57,8 +59,11 @@ class AddCalendar : AppCompatActivity() {
                     // < 2 > picker에서 선택한 날짜로 설정
                     calendar_start.set(year, month + 1, dayOfMonth)
                     val myText:TextView = findViewById(R.id.btnInput)
-                    myText.text = "$year.$month.$dayOfMonth"
-                    dateText = myText.text.toString()
+                    val month_s = month+1
+                    myText.text = "$year.$month_s.$dayOfMonth"
+                    dateText_y = year.toString()
+                    dateText_m = month_s.toString()
+                    dateText_d = dayOfMonth.toString()
                 }
                 // < 3 > datepicker가 처음 떴을 때 오늘 날짜가 보이도록 설정
             }, year1, month2, day3)
@@ -127,30 +132,44 @@ class AddCalendar : AppCompatActivity() {
         radio.setOnCheckedChangeListener{_,id ->
             when(id){
                 R.id.account_type1->{
-                    radioType = "저축"
+                    radioType = "save"
                 }
                 R.id.account_type2 -> {
-                    radioType="지출"
+                    radioType="spend"
                 }
 
             }
 
         }
 
-
+        //툴바 설정
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+
+
         binding.btnOk.setOnClickListener {
+            val year = dateText_y
+            val month = dateText_m
+            val date = dateText_d
+            val tempDate = java.util.Date(year.toInt()-1900,month.toInt()-1,date.toInt())
+            val inputDate = com.google.firebase.Timestamp(tempDate)
             val amount: String = findViewById<EditText?>(R.id.price_amount).text.toString()
             val memo: String = findViewById<EditText?>(R.id.memo).text.toString()
-            Log.d("add_test","$radioType, $amount, $memo,$spinnerType,$dateText ")
-            Toast.makeText(this@AddCalendar,"가계부 입력 성공",Toast.LENGTH_SHORT).show()
+            val newData = hashMapOf(
+                "angry" to 0,
+                "cost" to amount,
+                "date" to inputDate,
+                "name" to memo,
+                "smile" to 0,
+                "tag" to spinnerType,
+                "type" to radioType
+            )
 
-            db.collection("accounts").document()
-                .set(Account(userName,radioType,amount,spinnerType,memo,dateText))
-                .addOnSuccessListener { Log.d("TEST", "DocumentSnapshot successfully written!") }
-                .addOnFailureListener { e -> Log.w("TEST", "Error writing document", e) }
+            db.collection("users").document("cDHZ1eavHhLxULN3HiX3")
+                .collection("accountBook")
+                .add(newData)
+            Toast.makeText(this@AddCalendar,"가계부 입력 성공",Toast.LENGTH_SHORT).show()
             val intent = Intent(this,CalendarActivity::class.java)
             startActivity(intent)
         }

@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
+    android:layout_gravity="center|top"
     android:padding="5dp"
     android:layout_marginBottom="10dp"
     android:layout_marginLeft="20dp"
     android:layout_marginRight="20dp"
+
     android:orientation="vertical">
     <LinearLayout
         android:layout_width="wrap_content"
@@ -37,26 +40,30 @@
         android:layout_gravity="center">
 
         <ImageView
+            android:id="@+id/tag_img"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="10dp"
             android:layout_marginStart="10dp"
-            android:id="@+id/tag_img"
             android:src="@drawable/etc_icon" />
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="180dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
+            android:gravity="center|left"
             android:layout_gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            tools:ignore="RtlHardcoded">
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="170dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/account_price"
                 android:text="-15,000원"
                 android:textColor="@color/red"
                 android:textStyle="bold"/>
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="170dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/account_name"
                 android:text="붕어빵"/>
@@ -64,22 +71,22 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="100dp"
-            android:layout_marginRight="20dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginEnd="25dp"
+            android:layout_gravity="center">
             <Button
+                android:id="@+id/smileIcon"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:background="@drawable/smile_icon"
-                android:id="@+id/smileIcon"/>
+                android:background="@drawable/smile_icon"/>
             <TextView
+                android:id="@+id/smileText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:textSize="13sp"
-                android:id="@+id/smileText"
                 android:text="0"/>
+
         </LinearLayout>
 
         <LinearLayout
@@ -88,17 +95,16 @@
             android:layout_gravity="center"
             android:orientation="vertical">
             <Button
+                android:id="@+id/angryIcon"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:background="@drawable/angry_icon"
-                android:id="@+id/angryIcon"
-                />
+                android:background="@drawable/angry_icon" />
             <TextView
+                android:id="@+id/angryText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:textSize="13sp"
-                android:id="@+id/angryText"
                 android:text="0"/>
         </LinearLayout>
 
