@@ -25,6 +25,9 @@
             android:name=".CalendarActivity"
             android:exported="false" />
         <activity
+            android:name=".EditProfile"
+            android:exported="false" />
+        <activity
             android:name=".Chatting"
             android:exported="true" >
         </activity>

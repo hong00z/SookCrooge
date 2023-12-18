@@ -62,7 +62,7 @@ class CalendarActivity :AppCompatActivity() {
         var selectedMonthSpend=0
         var currentSelectedMonth=CalendarDay.today().month
         binding.totalMonth.text = "12"
-        val dataQuery = db.collection("users").document("cDHZ1eavHhLxULN3HiX3").collection("accountBook").orderBy("date")
+        val dataQuery = db.collection("users").document(loginInformation.currentLoginUser!!.uid).collection("accountBook").orderBy("date")
         dataQuery.addSnapshotListener { snapshots, e ->
             for (dc in snapshots!!.documentChanges) {
                 when (dc.type) {
@@ -75,13 +75,14 @@ class CalendarActivity :AppCompatActivity() {
                         val calendarDayListTemp = ArrayList<CalendarDay>()
                         val calendarDay = CalendarDay.from(year.toInt(), month.toInt()-1, day.toInt())
                         calendarDayListTemp.add(CalendarDay.from(year.toInt(), month.toInt()-1, day.toInt()))
+
                         val hasAlreadyDate = decoratorList.find{it.date.equals(calendarDay)}
                         if (hasAlreadyDate==null)
                         {
                             if (dc.document.data["type"]=="save")
                             {
                                 var decorator = planDotDecorator(calendarDayListTemp, dc.document.data["cost"].toString().toInt(), 0,this)
-                                val data=calendarDates(calendarDay, dc.document.data["cost"].toString().toInt(), 2000)
+                                val data=calendarDates(calendarDay, dc.document.data["cost"].toString().toInt(), 0)
                                 decoratorList.add(data)
                                 binding.materialCalendar.addDecorator(decorator)
                             }
@@ -98,11 +99,13 @@ class CalendarActivity :AppCompatActivity() {
                             //decorator 전체 지우고 다시 그리기
                             decoratorList.remove(hasAlreadyDate)
                             binding.materialCalendar.removeDecorators()
-                            decoratorList.forEach{
+                            for (i in 0..decoratorList.size-1)
+                            {
                                 val tempCalendarDayList = ArrayList<CalendarDay>()
-                                calendarDayListTemp.add(it.date)
-                                val decorator=planDotDecorator(tempCalendarDayList, it.saving, it.spend, this)
-                                binding.materialCalendar.addDecorator(decorator)
+                                tempCalendarDayList.add(decoratorList[i].date)
+                                var currentDecorator= OthersCalendar.planDotDecorator(
+                                    tempCalendarDayList, decoratorList[i].saving, decoratorList[i].spend, this)
+                                binding.materialCalendar.addDecorator(currentDecorator)
                             }
 
                             //decoratorList에 추가한 후 캘린더 뷰에 보이도록 추가
@@ -328,19 +331,19 @@ class CalendarActivity :AppCompatActivity() {
 
             if (saving !="0")
             {
-                paint.textSize=29f
+                paint.textSize=27f
                 paint.color=Color.parseColor("#0083E2")
                 canvas.drawText(
                     "+"+this.saving,
-                    ((start+end)/2).toFloat(), (bottom+15).toFloat(), paint)
+                    ((start+end)/2).toFloat(), (bottom+10).toFloat(), paint)
             }
             if (spend !="0")
             {
-                paint.textSize=29f
+                paint.textSize=27f
                 paint.color=Color.parseColor("#EC1F1F")
                 canvas.drawText(
                     "- "+this.spend,
-                    ((start+end)/2).toFloat(), (bottom+40).toFloat(), paint)
+                    ((start+end)/2).toFloat(), (bottom+30).toFloat(), paint)
             }
             paint.textSize=40f
             paint.color=Color.BLACK

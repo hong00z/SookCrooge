@@ -76,7 +76,6 @@ class ChatActivity : AppCompatActivity() {
                     .setView(dialogView)
                     .create()
                 val chatName = dialogView.findViewById<EditText>(R.id.chat_name).text
-                val chatNum= dialogView.findViewById<EditText>(R.id.chat_num).text
                 val button1 = dialogView.findViewById<Button>(R.id.positiveButton)
                 val button2 = dialogView.findViewById<Button>(R.id.cancel_button)
                 val currentDate = LocalDate.now()
@@ -86,10 +85,9 @@ class ChatActivity : AppCompatActivity() {
                     db.collection("users").whereEqualTo("uid", loginInformation.currentLoginUser!!.uid).get().addOnSuccessListener {
                         val userName = it.documents[0].get("nickname").toString()
                         val documentID=makeDocumentCode()
-                        val chattingRoom=Chat(chatName.toString(),chatNum.toString(),userName,currentDate.toString(), documentID)
+                        val chattingRoom=Chat(chatName.toString(),userName,currentDate.toString(), documentID)
                         db.collection("rooms").document(documentID).set(chattingRoom).addOnSuccessListener {
 
-                                    Log.d("jhs", chattingRoom.documentID.toString())
                                     Log.d("TEST", "DocumentSnapshot successfully written!")
                                     alertDialog.dismiss()
                                 }

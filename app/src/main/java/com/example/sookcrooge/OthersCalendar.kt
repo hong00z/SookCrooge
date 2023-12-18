@@ -83,7 +83,7 @@ class OthersCalendar : AppCompatActivity() {
                             if (dc.document.data["type"]=="save")
                             {
                                 var decorator = planDotDecorator(calendarDayListTemp, dc.document.data["cost"].toString().toInt(), 0,this)
-                                val data=calendarDates(calendarDay, dc.document.data["cost"].toString().toInt(), 2000)
+                                val data=calendarDates(calendarDay, dc.document.data["cost"].toString().toInt(), 0)
                                 decoratorList.add(data)
                                 binding.othersMaterialCalendar.addDecorator(decorator)
                             }
@@ -101,11 +101,13 @@ class OthersCalendar : AppCompatActivity() {
                             //decorator 전체 지우고 다시 그리기
                             decoratorList.remove(hasAlreadyDate)
                             binding.othersMaterialCalendar.removeDecorators()
-                            decoratorList.forEach{
+
+                            for (i in 0..decoratorList.size-1)
+                            {
                                 val tempCalendarDayList = ArrayList<CalendarDay>()
-                                calendarDayListTemp.add(it.date)
-                                val decorator=planDotDecorator(tempCalendarDayList, it.saving, it.spend, this)
-                                binding.othersMaterialCalendar.addDecorator(decorator)
+                                tempCalendarDayList.add(decoratorList[i].date)
+                                var currentDecorator=planDotDecorator( tempCalendarDayList, decoratorList[i].saving, decoratorList[i].spend, this)
+                                binding.othersMaterialCalendar.addDecorator(currentDecorator)
                             }
 
                             //decoratorList에 추가한 후 캘린더 뷰에 보이도록 추가
@@ -123,6 +125,8 @@ class OthersCalendar : AppCompatActivity() {
                                 var decorator = planDotDecorator(calendarDayListTemp, hasAlreadyDate.saving, hasAlreadyDate.spend+dc.document.data["cost"].toString().toInt(),this)
                                 binding.othersMaterialCalendar.addDecorator(decorator)
                             }
+
+
                         }
                         val newItem = accountItem(dc.document.id, dc.document.data["name"].toString(), dc.document.data["cost"].toString().toInt(),
                             (month.toInt()-1).toString(), day.toString(), dc.document.data["type"].toString(),

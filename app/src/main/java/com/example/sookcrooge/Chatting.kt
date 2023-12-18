@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -58,7 +57,7 @@ class Chatting : AppCompatActivity() {
                     userNickname=document["nickname"].toString()
                 }
                 var prevChattingLogDate:String? = null
-                val chatting = db.collection("chattingRoom_"+documentID).orderBy("time")
+                val chatting = db.collection("rooms").document(documentID).collection("chattingLog").orderBy("time")
                 chatting.addSnapshotListener{ snapshot, e ->
                     for (document in snapshot!!.documentChanges) {
                         if (document.type == DocumentChange.Type.ADDED)
@@ -136,14 +135,13 @@ class Chatting : AppCompatActivity() {
                             }
                             var itemDatas = mutableListOf<accountItem>()
                             var today=System.currentTimeMillis()
-                            today+=32400000
                             today-=today%86400000
                             val todayDate=Date(today)
                             val todayTimestamp=Timestamp(todayDate)
 
-
                             db.collection("users").whereEqualTo("nickname", accountWindowUserName).get().addOnSuccessListener {
                                 val othersUserUID=it.documents[0].data?.get("uid").toString()
+
                                 db.collection("users").document(othersUserUID).collection("accountBook").whereGreaterThanOrEqualTo("date", todayTimestamp).orderBy("date").get()
                                     .addOnSuccessListener {documents->
                                         if (documents.size()==0)
@@ -210,7 +208,6 @@ class Chatting : AppCompatActivity() {
             }
 
 
-
         }
         binding.userRecycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.userRecycler.adapter = usersAdapter(this, userAccountWindowDatas)
@@ -225,14 +222,18 @@ class Chatting : AppCompatActivity() {
                 "nickname" to userNickname,
                 "text" to binding.chattingEditText.text.toString(),
                 "time" to currentTime,
+                "documentID" to documentID
             )
-            db.collection("chattingRoom_shdknm1hks")
-                .add(newMessage)
+            db.collection("rooms").document(documentID).collection("chattingLog").add(newMessage)
             binding.userAccountWindow.visibility= View.GONE
             binding.chattingEditText.setText("")
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(binding.chattingEditText.windowToken, 0)
-            binding.messageRecycler.smoothScrollToPosition(binding.messageRecycler.adapter!!.itemCount - 1)
+            if (binding.messageRecycler.adapter!!.itemCount != 0)
+            {
+                binding.messageRecycler.smoothScrollToPosition(binding.messageRecycler.adapter!!.itemCount - 1)
+            }
+
         }
 
         binding.fold.setOnClickListener {

@@ -13,12 +13,14 @@ import com.example.sookcrooge.databinding.ChatRecyclerBinding
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlin.properties.Delegates
 
 
 class ChatViewHolder(val binding: ChatRecyclerBinding) : RecyclerView.ViewHolder(binding.root)
 class ChatAdapter (val datas: MutableList<Chat>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     val db = Firebase.firestore
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         ChatViewHolder(ChatRecyclerBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
@@ -36,14 +38,20 @@ class ChatAdapter (val datas: MutableList<Chat>) :
                 val userNames=it.documents[0].data?.get("userName").toString()
                 if (!userNames.contains(loginInformation.currentLoginUser!!.nickname.toString()))
                 {
-                    Log.d("jhs", userNames)
                     val newUserName=userNames+","+loginInformation.currentLoginUser!!.nickname.toString()
-                    datas[position].documentID?.let { it1 -> db.collection("rooms").document(it1).update("userName", newUserName) }
+                    datas[position].documentID?.let { it1 -> db.collection("rooms").document(it1).update("userName", newUserName)
+                        intent.putExtra("documentID", datas[position].documentID)
+                        intent.putExtra("chatName", datas[position].chatName)
+                        startActivity(holder.itemView.context,intent,null)
+                    }
+                }
+                else
+                {
+                    intent.putExtra("documentID", datas[position].documentID)
+                    intent.putExtra("chatName", datas[position].chatName)
+                    startActivity(holder.itemView.context,intent,null)
                 }
             }
-            intent.putExtra("documentID", datas[position].documentID)
-            intent.putExtra("chatName", datas[position].chatName)
-            startActivity(holder.itemView.context,intent,null)
         }
         holder.itemView.setOnLongClickListener {
 

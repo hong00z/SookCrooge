@@ -34,7 +34,6 @@ class Login : AppCompatActivity() {
         val binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         auth = com.google.firebase.ktx.Firebase.auth
-
         val activityContext=this
         binding.btnNaverLogin.setOnClickListener {
             NaverIdLoginSDK.logout()

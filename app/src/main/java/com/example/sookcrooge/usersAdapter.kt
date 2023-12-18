@@ -1,10 +1,8 @@
 package com.example.sookcrooge
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.sookcrooge.databinding.ChattingUsersBinding
@@ -15,7 +13,7 @@ class userViewHolder(val binding: ChattingUsersBinding) : RecyclerView.ViewHolde
 {
 
 }
-class usersAdapter(val context: Context, val datas: MutableList<userItem>):RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class usersAdapter(val context: Chatting, val datas: MutableList<userItem>):RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private lateinit var itemClickListener : OnItemClickListener
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         userViewHolder(ChattingUsersBinding.inflate(LayoutInflater.from(parent.context), parent,

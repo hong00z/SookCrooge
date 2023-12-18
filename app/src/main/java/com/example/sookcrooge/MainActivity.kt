@@ -26,6 +26,7 @@ import com.example.sookcrooge.databinding.AccountListBinding
 import com.example.sookcrooge.databinding.ActivityMainBinding
 import com.example.sookcrooge.databinding.NavigationHeaderBinding
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
@@ -46,6 +47,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var viewHeader: View
     lateinit var navViewHeaderBinding: NavigationHeaderBinding
     lateinit var userUID: String
+    private lateinit var auth: FirebaseAuth
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -74,10 +76,8 @@ class MainActivity : AppCompatActivity() {
                 db.collection("users").document(document.id).collection("accountBook").whereGreaterThanOrEqualTo("date",firstDayOfMonth).get().addOnSuccessListener{
                     for (item in it)
                     {
-                        Log.d("jhs", document.data.toString())
                         if (item.data?.get("type").toString()=="spend" && item.data?.get("angry").toString().toInt() > maxAngry)
                         {
-                            Log.d("jhs", "소비: "+item.data.toString())
                             maxAngryName=document.data?.get("nickname").toString()
                             maxAngry=item.data?.get("angry").toString().toInt()
 
@@ -90,7 +90,6 @@ class MainActivity : AppCompatActivity() {
                         }
                         if (item.data?.get("type").toString()=="save" && item.data?.get("smile").toString().toInt() > maxSmile)
                         {
-                            Log.d("jhs", "절약: "+item.data.toString())
                             maxSmileName=document.data?.get("nickname").toString()
                             maxSmile=item.data?.get("smile").toString().toInt()
                             var timeStamp = item.data["date"] as Timestamp
