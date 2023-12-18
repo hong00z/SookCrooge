@@ -60,38 +60,79 @@ class EditProfile : AppCompatActivity() {
         }
 
         binding.editProfileButton.setOnClickListener{
-            if (isAllConditionQualified())
-            {
-                name = binding.editInputName.text.toString()
 
-                var map= mutableMapOf<String,Any>()
-                map["name"] = name
-                map["nickname"] = nickname
-                val oldNickname = loginInformation.currentLoginUser?.nickname.toString()
-                db.collection("users").document(userUID).update(map).addOnSuccessListener {
+            nickname = binding.editInputNickname.text.toString()
+            password = binding.editInputPassword.text.toString()
+            var b:Boolean = true
 
-                    var nicknameMap = mutableMapOf<String, Any>()
-                    nicknameMap["userName"]= nickname
-                    db.collectionGroup("chatUsers").whereEqualTo("userName", oldNickname).get().addOnSuccessListener{
-                        for (document in it)
+            db.collection("users").whereEqualTo("nickname", nickname).get().addOnSuccessListener { documents ->
+                if (documents.size()==0)
+                {
+                    binding.editWarningNickname.visibility= View.INVISIBLE
+                }
+                else if (documents.size()==1)
+                {
+
+                    for (document in documents) {
+                        if (document.id == userUID)
                         {
-                            db.collection("rooms").document(document.get("documentID").toString()).
-                            collection("chatUsers").document(document.id).update(nicknameMap)
-                            db.collectionGroup("chattingLog").whereEqualTo("userName", oldNickname).get().addOnSuccessListener {
-                                for (document in it)
-                                {
-                                    db.collection("rooms").document(document.data["documentID"].toString()).
-                                    collection("chattingLog").document(document.id).update(nicknameMap)
+                            binding.editWarningNickname.visibility= View.INVISIBLE
+                        }
+                        else
+                        {
+                            binding.editWarningNickname.visibility= View.VISIBLE
+                            b = false
+                        }
+                    }
+                }
+                else
+                {
+                    binding.editWarningNickname.visibility= View.VISIBLE
+                    b = false
+                }
+
+                if (userPassword == password)
+                {
+                    binding.editWarningPassword.visibility= View.INVISIBLE
+                }
+                else
+                {
+                    b = false
+                    binding.editWarningPassword.visibility= View.VISIBLE
+                }
+                if (b == true)
+                {
+                    name = binding.editInputName.text.toString()
+
+                    var map= mutableMapOf<String,Any>()
+                    map["name"] = name
+                    map["nickname"] = nickname
+                    val oldNickname = loginInformation.currentLoginUser?.nickname.toString()
+                    db.collection("users").document(userUID).update(map).addOnSuccessListener {
+
+                        var nicknameMap = mutableMapOf<String, Any>()
+                        nicknameMap["userName"]= nickname
+                        db.collectionGroup("chatUsers").whereEqualTo("userName", oldNickname).get().addOnSuccessListener{
+                            for (document in it)
+                            {
+                                db.collection("rooms").document(document.get("documentID").toString()).
+                                collection("chatUsers").document(document.id).update(nicknameMap)
+                                db.collectionGroup("chattingLog").whereEqualTo("userName", oldNickname).get().addOnSuccessListener {
+                                    for (document in it)
+                                    {
+                                        db.collection("rooms").document(document.data["documentID"].toString()).
+                                        collection("chattingLog").document(document.id).update(nicknameMap)
+                                    }
                                 }
                             }
+                            loginInformation.currentLoginUser?.nickname=nickname
                         }
-                        loginInformation.currentLoginUser?.nickname=nickname
-                    }
 
-                    val intent = intent
-                    intent.putExtra("nickname", nickname)
-                    setResult(RESULT_OK, intent)
-                    finish()
+                        val intent = intent
+                        intent.putExtra("nickname", nickname)
+                        setResult(RESULT_OK, intent)
+                        finish()
+                    }
                 }
             }
         }
@@ -144,62 +185,19 @@ class EditProfile : AppCompatActivity() {
                         .delete()
                 }
 
-
             }
         }
 
 
     }
 
-
-    private fun isAllConditionQualified():Boolean
-    {
-        nickname = binding.editInputNickname.text.toString()
-        password = binding.editInputPassword.text.toString()
-        var b:Boolean = true
-
-        val task = db.collection("users")
-            .whereEqualTo("nickname", nickname).get().addOnSuccessListener { documents ->
-                if (documents.size()==0)
-                {
-                    binding.editWarningNickname.visibility= View.INVISIBLE
-                }
-                else if (documents.size()==1)
-                {
-                    for (document in documents) {
-                        if (document.id == userUID)
-                        {
-                            binding.editWarningNickname.visibility= View.INVISIBLE
-                        }
-                        else
-                        {
-                            binding.editWarningNickname.visibility= View.VISIBLE
-                            b = false
-                        }
-                    }
-                }
-                else
-                {
-                    binding.editWarningNickname.visibility= View.VISIBLE
-                    b = false
-                }
-            }
-
-        if (userPassword == password)
-        {
-            binding.editWarningPassword.visibility= View.INVISIBLE
-        }
-        else
-        {
-            b = false
-            binding.editWarningPassword.visibility= View.VISIBLE
-        }
-        return b
-    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
+                val intent = intent
+                intent.putExtra("nickname", loginInformation.currentLoginUser?.nickname.toString())
+                setResult(RESULT_OK, intent)
                 finish()
                 return true
             }
