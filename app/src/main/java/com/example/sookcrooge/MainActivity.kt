@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        auth=Firebase.auth
         binding.profile.setOnClickListener{
             val navDrawer = binding.drawer
             if(!navDrawer.isDrawerOpen(GravityCompat.START)) navDrawer.openDrawer(GravityCompat.START);
@@ -149,6 +150,13 @@ class MainActivity : AppCompatActivity() {
         viewHeader = binding.mainDrawerView.getHeaderView(0)
         navViewHeaderBinding = NavigationHeaderBinding.bind(viewHeader)
 
+        val nicknameRequestLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()){
+            it.data!!.getStringExtra("nickname")?.let {
+                navViewHeaderBinding.nickname.text = it
+            }
+        }
+
         val requestLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode === android.app.Activity.RESULT_OK) {
                 Glide.with(getApplicationContext()).load(it.data?.data).apply(RequestOptions().override(200, 200))
@@ -206,7 +214,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.editProfile.setOnClickListener{
             val intent = Intent(this, EditProfile::class.java)
-            startActivity(intent)
+            nicknameRequestLauncher.launch(intent)
         }
 
         binding.accountBook.setOnClickListener{

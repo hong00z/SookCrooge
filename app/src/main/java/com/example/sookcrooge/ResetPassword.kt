@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.sookcrooge.databinding.ActivityResetPasswordBinding
+import com.example.sookcrooge.loginUser.Companion.email
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
@@ -128,27 +129,18 @@ class ResetPassword : AppCompatActivity() {
             if (isAllQualified==true)
             {
                 val newPassword = binding.resetPWDInputPassword.text.toString()
-                if (loginInformation?.loginType == loginUser.naverLogin)
-                {
-                    userUID=loginInformation.currentLoginUser!!.uid
-                }
-                else
-                {
-                    val user = Firebase.auth.currentUser
-                    userUID=user!!.uid
-                    user!!.updatePassword(newPassword)
-                }
-
-
-                var map= mutableMapOf<String,Any>()
-                map["password"] =newPassword
-                db.collection("users").document(userUID).update(map)
-                    .addOnCompleteListener{
-                        if(it.isSuccessful){
+                db.collection("users").whereEqualTo("email", binding.resetPWDInputEmail.text.toString()).get().addOnSuccessListener{
+                    Log.d("jhs", it.documents[0].id)
+                    var map= mutableMapOf<String,Any>()
+                    map["password"] = newPassword
+                    db.collection("users").document(it.documents[0].id).update(map).addOnCompleteListener{ its->
+                        if(its.isSuccessful){
                             Log.d("jhs", "업데이트됨")
                         }
                     }
-                finish()
+                    finish()
+                }
+
             }
         }
 

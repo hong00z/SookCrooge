@@ -51,8 +51,6 @@ class OthersCalendar : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         auth= Firebase.auth
 
-        val smileText = findViewById<TextView>(R.id.smileText)
-        val angryText = findViewById<TextView>(R.id.angryText)
         val intent= intent
         val otherUserUID=intent.getStringExtra("uid")
         binding.toolbar.title=intent.getStringExtra("nickname")+"의 가계부"
@@ -149,11 +147,11 @@ class OthersCalendar : AppCompatActivity() {
 
                         (binding.recyclerView.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
                             override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
-                                smileText.text= (data.smile+1).toString()
+                                binding.smileText.text= (data.smile+1).toString()
                                 db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("smile", (data.smile+1))
                             }
                             override fun onAngryClick(binding: AccountListBinding, data: accountItem) {
-                                angryText.text= (data.angry+1).toString()
+                                binding.angryText.text= (data.angry+1).toString()
                                 db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("angry", (data.angry+1))
                             }
                         })
@@ -182,11 +180,11 @@ class OthersCalendar : AppCompatActivity() {
                         }
                         (binding.recyclerView.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
                             override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
-                                smileText.text= (data.smile+1).toString()
+                                binding.smileText.text= (data.smile+1).toString()
                                 db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("smile", (data.smile+1))
                             }
                             override fun onAngryClick(binding: AccountListBinding, data: accountItem) {
-                                angryText.text= (data.angry+1).toString()
+                                binding.angryText.text= (data.angry+1).toString()
                                 db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("angry", (data.angry+1))
                             }
                         })
@@ -262,11 +260,11 @@ class OthersCalendar : AppCompatActivity() {
                     binding.totalMonthSpend.text=selectedMonthSpend.toString()
                     (binding.recyclerView.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
                         override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
-                            smileText.text= (data.smile+1).toString()
+                            binding.smileText.text= (data.smile+1).toString()
                             db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("smile", (data.smile+1))
                         }
                         override fun onAngryClick(binding: AccountListBinding, data: accountItem) {
-                            angryText.text= (data.angry+1).toString()
+                            binding.angryText.text= (data.angry+1).toString()
                             db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("angry", (data.angry+1))
                         }
                     })

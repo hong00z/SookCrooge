@@ -67,10 +67,33 @@ class EditProfile : AppCompatActivity() {
                 var map= mutableMapOf<String,Any>()
                 map["name"] = name
                 map["nickname"] = nickname
-                db.collection("users").document(userUID).update(map)
-                finish()
-            }
+                val oldNickname = loginInformation.currentLoginUser?.nickname.toString()
+                db.collection("users").document(userUID).update(map).addOnSuccessListener {
 
+                    var nicknameMap = mutableMapOf<String, Any>()
+                    nicknameMap["userName"]= nickname
+                    db.collectionGroup("chatUsers").whereEqualTo("userName", oldNickname).get().addOnSuccessListener{
+                        for (document in it)
+                        {
+                            db.collection("rooms").document(document.get("documentID").toString()).
+                            collection("chatUsers").document(document.id).update(nicknameMap)
+                            db.collectionGroup("chattingLog").whereEqualTo("userName", oldNickname).get().addOnSuccessListener {
+                                for (document in it)
+                                {
+                                    db.collection("rooms").document(document.data["documentID"].toString()).
+                                    collection("chattingLog").document(document.id).update(nicknameMap)
+                                }
+                            }
+                        }
+                        loginInformation.currentLoginUser?.nickname=nickname
+                    }
+
+                    val intent = intent
+                    intent.putExtra("nickname", nickname)
+                    setResult(RESULT_OK, intent)
+                    finish()
+                }
+            }
         }
 
         binding.deleteAccountButton.setOnClickListener{
@@ -171,7 +194,7 @@ class EditProfile : AppCompatActivity() {
             b = false
             binding.editWarningPassword.visibility= View.VISIBLE
         }
-        return false
+        return b
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

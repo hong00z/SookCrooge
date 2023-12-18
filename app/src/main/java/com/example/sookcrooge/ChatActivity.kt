@@ -87,10 +87,12 @@ class ChatActivity : AppCompatActivity() {
                         val documentID=makeDocumentCode()
                         val chattingRoom=Chat(chatName.toString(),userName,currentDate.toString(), documentID)
                         db.collection("rooms").document(documentID).set(chattingRoom).addOnSuccessListener {
-
-                                    Log.d("TEST", "DocumentSnapshot successfully written!")
-                                    alertDialog.dismiss()
-                                }
+                            val currentUser = hashMapOf("userName" to userName, "documentID" to documentID)
+                            db.collection("rooms").document(documentID).collection("chatUsers").add(currentUser).addOnSuccessListener{
+                                Log.d("TEST", "DocumentSnapshot successfully written!")
+                                alertDialog.dismiss()
+                            }
+                        }
                             .addOnFailureListener { e -> Log.w("TEST", "Error writing document", e)
                                 alertDialog.dismiss()}
                     }

@@ -331,19 +331,19 @@ class CalendarActivity :AppCompatActivity() {
 
             if (saving !="0")
             {
-                paint.textSize=27f
+                paint.textSize=29f
                 paint.color=Color.parseColor("#0083E2")
                 canvas.drawText(
                     "+"+this.saving,
-                    ((start+end)/2).toFloat(), (bottom+10).toFloat(), paint)
+                    ((start+end)/2).toFloat(), (bottom+15).toFloat(), paint)
             }
             if (spend !="0")
             {
-                paint.textSize=27f
+                paint.textSize=29f
                 paint.color=Color.parseColor("#EC1F1F")
                 canvas.drawText(
                     "- "+this.spend,
-                    ((start+end)/2).toFloat(), (bottom+30).toFloat(), paint)
+                    ((start+end)/2).toFloat(), (bottom+40).toFloat(), paint)
             }
             paint.textSize=40f
             paint.color=Color.BLACK

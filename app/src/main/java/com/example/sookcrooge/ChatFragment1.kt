@@ -44,6 +44,7 @@ class ChatFragment1 : Fragment() {
     ): View? {
         val binding = FragmentChat1Binding.inflate(layoutInflater,container,false)
         val chatData = mutableListOf<Chat>()
+
         db.collection("rooms")
             .addSnapshotListener { value, e ->
                 if (e != null) {
@@ -64,6 +65,14 @@ class ChatFragment1 : Fragment() {
                                 binding.recyclerChat1.layoutManager = layoutManager
                                 val adapter = ChatAdapter(chatData)
                                 binding.recyclerChat1.adapter = adapter
+
+                                (binding.recyclerChat1.adapter as ChatAdapter).setItemClickListener(object: ChatAdapter.OnItemClickListener{
+                                    override fun update(data: Chat){
+                                        chatData.remove(data)
+                                        binding.recyclerChat1.adapter=ChatAdapter(chatData)
+                                        ChatAdapter(chatData).notifyDataSetChanged()
+                                    }
+                                })
                             }
                             else -> {}
                         }

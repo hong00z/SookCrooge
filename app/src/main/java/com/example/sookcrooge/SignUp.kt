@@ -1,10 +1,12 @@
 package com.example.sookcrooge
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.sookcrooge.databinding.ActivitySignUpBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -98,13 +100,23 @@ class SignUp : AppCompatActivity() {
                                                 "photoURL" to "null"
                                             )
 
-                                            db.collection("users").document(userUID!!).set(newUser)
+                                            db.collection("users").document(userUID.toString()).set(newUser).addOnSuccessListener {
+                                                val intent= Intent(this, Login::class.java)
+                                                startActivity(intent)
+                                                auth.signOut()
+                                            }
+                                                .addOnFailureListener{
+                                                    Log.d("jhs", it.toString())
+                                                }
                                         }
                                         else
                                         {
                                             Log.d("jhs", "회원 가입 실패")
                                         }
                                     }
+
+
+
                             }
                         }
                 }

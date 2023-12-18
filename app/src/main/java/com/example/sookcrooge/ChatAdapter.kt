@@ -2,6 +2,7 @@ package com.example.sookcrooge
 
 import android.content.Intent
 import android.graphics.Color
+import android.provider.SyncStateContract.Helpers.update
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -9,7 +10,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.example.sookcrooge.databinding.AccountListBinding
 import com.example.sookcrooge.databinding.ChatRecyclerBinding
+import com.example.sookcrooge.databinding.FragmentChat2Binding
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -20,7 +23,7 @@ class ChatViewHolder(val binding: ChatRecyclerBinding) : RecyclerView.ViewHolder
 class ChatAdapter (val datas: MutableList<Chat>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     val db = Firebase.firestore
-
+    private lateinit var itemClickListener : OnItemClickListener
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         ChatViewHolder(ChatRecyclerBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
@@ -34,12 +37,13 @@ class ChatAdapter (val datas: MutableList<Chat>) :
         holder.itemView.setOnClickListener {
             datas[position].documentID?.let { it1 -> Log.d("jhs", it1) }
             val intent = Intent(holder.itemView.context,Chatting::class.java)
-            val temp = db.collection("rooms").whereEqualTo("documentID", datas[position].documentID).get().addOnSuccessListener{
-                val userNames=it.documents[0].data?.get("userName").toString()
-                if (!userNames.contains(loginInformation.currentLoginUser!!.nickname.toString()))
+            val userName=loginInformation.currentLoginUser?.nickname.toString()
+            val documentID = datas[position].documentID.toString()
+            db.collection("rooms").document(datas[position].documentID.toString()).collection("chatUsers").whereEqualTo("userName", userName).get().addOnSuccessListener{
+                if (it.size()==0)
                 {
-                    val newUserName=userNames+","+loginInformation.currentLoginUser!!.nickname.toString()
-                    datas[position].documentID?.let { it1 -> db.collection("rooms").document(it1).update("userName", newUserName)
+                    val currentUser = hashMapOf("userName" to userName, "documentID" to documentID)
+                    db.collection("rooms").document(documentID).collection("chatUsers").add(currentUser).addOnSuccessListener{
                         intent.putExtra("documentID", datas[position].documentID)
                         intent.putExtra("chatName", datas[position].chatName)
                         startActivity(holder.itemView.context,intent,null)
@@ -51,6 +55,7 @@ class ChatAdapter (val datas: MutableList<Chat>) :
                     intent.putExtra("chatName", datas[position].chatName)
                     startActivity(holder.itemView.context,intent,null)
                 }
+
             }
         }
         holder.itemView.setOnLongClickListener {
@@ -64,20 +69,16 @@ class ChatAdapter (val datas: MutableList<Chat>) :
             // 대화상자의 확인 버튼을 설정
             builder.setPositiveButton("확인") { dialog, which ->
                 val item = datas[position]
-                db.collection("rooms").whereEqualTo("chatName",item)
-                    .addSnapshotListener { snapshots, e ->
-                        if (e != null) {
-                            Log.w("chatErr", "listen:error $e")
-                            return@addSnapshotListener
-                        }
-                        for (document in snapshots!!.documentChanges) {
-                            if (document.type == DocumentChange.Type.ADDED || document.type == DocumentChange.Type.MODIFIED) {
-
-                                db.collection("rooms").document(document.document.id).delete()
-                            }
-                        }
+                Log.d("jhs", item.toString())
+                val userName=loginInformation.currentLoginUser?.nickname.toString()
+                db.collection("rooms").document(item.documentID.toString()).
+                collection("chatUsers").whereEqualTo("userName",userName).get().addOnSuccessListener {
+                    if (it.size() != 0) {
+                        db.collection("rooms").document(item.documentID.toString())
+                            .collection("chatUsers").document(it.documents[0].id).delete()
+                        itemClickListener.update(datas[position])
                     }
-
+                }
             }
 
             // 대화상자의 취소 버튼을 설정
@@ -102,6 +103,12 @@ class ChatAdapter (val datas: MutableList<Chat>) :
 
     }
 
+    fun setItemClickListener(onItemClickListener: OnItemClickListener) {
+        this.itemClickListener = onItemClickListener
+    }
 
+    interface OnItemClickListener {
+        fun update(data: Chat)
+    }
 }
 
