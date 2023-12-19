@@ -189,14 +189,26 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        navViewHeaderBinding.changeProfile.setOnClickListener{
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.setDataAndType(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                "image/*"
-            )
-            requestLauncher.launch(intent)
+        val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission())
+        {isGranted->
+            if (isGranted)
+            {
+                val intent = Intent(Intent.ACTION_PICK)
+                intent.setDataAndType(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    "image/*"
+                )
+                requestLauncher.launch(intent)
+            }
+            else
+            {
+                Toast.makeText(this, "사진 및 동영상 권한을 설정해야 합니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
 
+
+        navViewHeaderBinding.changeProfile.setOnClickListener{
+            requestPermissionLauncher.launch("android.permission.READ_MEDIA_IMAGES")
         }
 
         binding.logout.setOnClickListener{
