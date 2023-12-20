@@ -46,30 +46,6 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
-        <TextView
-            android:id="@+id/confirmTextView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:minHeight="50dp"
-            android:textSize="14sp"
-            android:text="채팅방 인원 : "
-           />
-        <EditText
-            android:layout_width="200dp"
-            android:id="@+id/chat_num"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            >
-
-        </EditText>
-
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

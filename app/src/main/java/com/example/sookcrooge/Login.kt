@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -34,8 +35,17 @@ class Login : AppCompatActivity() {
         val binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         auth = com.google.firebase.ktx.Firebase.auth
+        auth.signOut()
 
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         val activityContext=this
+
+        binding.btnResetPassword.setOnClickListener {
+            val intent=Intent(this, ResetPassword::class.java)
+            startActivity(intent)
+        }
+
         binding.btnNaverLogin.setOnClickListener {
             NaverIdLoginSDK.logout()
             val oAuthLoginCallback = object : OAuthLoginCallback {
@@ -143,5 +153,15 @@ class Login : AppCompatActivity() {
 
             }
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

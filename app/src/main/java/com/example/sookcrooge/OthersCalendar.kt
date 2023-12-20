@@ -51,8 +51,6 @@ class OthersCalendar : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         auth= Firebase.auth
 
-        val smileText = findViewById<TextView>(R.id.smileText)
-        val angryText = findViewById<TextView>(R.id.angryText)
         val intent= intent
         val otherUserUID=intent.getStringExtra("uid")
         binding.toolbar.title=intent.getStringExtra("nickname")+"의 가계부"
@@ -83,7 +81,7 @@ class OthersCalendar : AppCompatActivity() {
                             if (dc.document.data["type"]=="save")
                             {
                                 var decorator = planDotDecorator(calendarDayListTemp, dc.document.data["cost"].toString().toInt(), 0,this)
-                                val data=calendarDates(calendarDay, dc.document.data["cost"].toString().toInt(), 2000)
+                                val data=calendarDates(calendarDay, dc.document.data["cost"].toString().toInt(), 0)
                                 decoratorList.add(data)
                                 binding.othersMaterialCalendar.addDecorator(decorator)
                             }
@@ -101,11 +99,13 @@ class OthersCalendar : AppCompatActivity() {
                             //decorator 전체 지우고 다시 그리기
                             decoratorList.remove(hasAlreadyDate)
                             binding.othersMaterialCalendar.removeDecorators()
-                            decoratorList.forEach{
+
+                            for (i in 0..decoratorList.size-1)
+                            {
                                 val tempCalendarDayList = ArrayList<CalendarDay>()
-                                calendarDayListTemp.add(it.date)
-                                val decorator=planDotDecorator(tempCalendarDayList, it.saving, it.spend, this)
-                                binding.othersMaterialCalendar.addDecorator(decorator)
+                                tempCalendarDayList.add(decoratorList[i].date)
+                                var currentDecorator=planDotDecorator( tempCalendarDayList, decoratorList[i].saving, decoratorList[i].spend, this)
+                                binding.othersMaterialCalendar.addDecorator(currentDecorator)
                             }
 
                             //decoratorList에 추가한 후 캘린더 뷰에 보이도록 추가
@@ -123,6 +123,8 @@ class OthersCalendar : AppCompatActivity() {
                                 var decorator = planDotDecorator(calendarDayListTemp, hasAlreadyDate.saving, hasAlreadyDate.spend+dc.document.data["cost"].toString().toInt(),this)
                                 binding.othersMaterialCalendar.addDecorator(decorator)
                             }
+
+
                         }
                         val newItem = accountItem(dc.document.id, dc.document.data["name"].toString(), dc.document.data["cost"].toString().toInt(),
                             (month.toInt()-1).toString(), day.toString(), dc.document.data["type"].toString(),
@@ -145,11 +147,11 @@ class OthersCalendar : AppCompatActivity() {
 
                         (binding.recyclerView.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
                             override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
-                                smileText.text= (data.smile+1).toString()
+                                binding.smileText.text= (data.smile+1).toString()
                                 db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("smile", (data.smile+1))
                             }
                             override fun onAngryClick(binding: AccountListBinding, data: accountItem) {
-                                angryText.text= (data.angry+1).toString()
+                                binding.angryText.text= (data.angry+1).toString()
                                 db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("angry", (data.angry+1))
                             }
                         })
@@ -178,11 +180,11 @@ class OthersCalendar : AppCompatActivity() {
                         }
                         (binding.recyclerView.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
                             override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
-                                smileText.text= (data.smile+1).toString()
+                                binding.smileText.text= (data.smile+1).toString()
                                 db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("smile", (data.smile+1))
                             }
                             override fun onAngryClick(binding: AccountListBinding, data: accountItem) {
-                                angryText.text= (data.angry+1).toString()
+                                binding.angryText.text= (data.angry+1).toString()
                                 db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("angry", (data.angry+1))
                             }
                         })
@@ -258,11 +260,11 @@ class OthersCalendar : AppCompatActivity() {
                     binding.totalMonthSpend.text=selectedMonthSpend.toString()
                     (binding.recyclerView.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
                         override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
-                            smileText.text= (data.smile+1).toString()
+                            binding.smileText.text= (data.smile+1).toString()
                             db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("smile", (data.smile+1))
                         }
                         override fun onAngryClick(binding: AccountListBinding, data: accountItem) {
-                            angryText.text= (data.angry+1).toString()
+                            binding.angryText.text= (data.angry+1).toString()
                             db.collection("users").document(otherUserUID.toString()).collection("accountBook").document(data.documentID).update("angry", (data.angry+1))
                         }
                     })

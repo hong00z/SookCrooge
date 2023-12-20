@@ -166,12 +166,11 @@ class AddCalendar : AppCompatActivity() {
                 "type" to radioType
             )
 
-            db.collection("users").document("cDHZ1eavHhLxULN3HiX3")
+            db.collection("users").document(loginInformation.currentLoginUser!!.uid)
                 .collection("accountBook")
                 .add(newData)
             Toast.makeText(this@AddCalendar,"가계부 입력 성공",Toast.LENGTH_SHORT).show()
-            val intent = Intent(this,CalendarActivity::class.java)
-            startActivity(intent)
+            finish()
         }
     }
 

@@ -76,25 +76,25 @@ class ChatActivity : AppCompatActivity() {
                     .setView(dialogView)
                     .create()
                 val chatName = dialogView.findViewById<EditText>(R.id.chat_name).text
-                val chatNum= dialogView.findViewById<EditText>(R.id.chat_num).text
                 val button1 = dialogView.findViewById<Button>(R.id.positiveButton)
                 val button2 = dialogView.findViewById<Button>(R.id.cancel_button)
                 val currentDate = LocalDate.now()
 
                 button1.setOnClickListener{
-                    alertDialog.dismiss()
+
                     db.collection("users").whereEqualTo("uid", loginInformation.currentLoginUser!!.uid).get().addOnSuccessListener {
                         val userName = it.documents[0].get("nickname").toString()
-                        val chattingRoom=Chat(chatName.toString(),chatNum.toString(),userName,currentDate.toString())
-                        db.collection("rooms")
-                            .add(chattingRoom)
-                            .addOnSuccessListener {
-                                chattingRoom.addDocumentID(it.id)
-                                it.update("documentID", it.id).addOnSuccessListener {
-                                    Log.d("TEST", "DocumentSnapshot successfully written!")
-                                }
+                        val documentID=makeDocumentCode()
+                        val chattingRoom=Chat(chatName.toString(),userName,currentDate.toString(), documentID)
+                        db.collection("rooms").document(documentID).set(chattingRoom).addOnSuccessListener {
+                            val currentUser = hashMapOf("userName" to userName, "documentID" to documentID)
+                            db.collection("rooms").document(documentID).collection("chatUsers").add(currentUser).addOnSuccessListener{
+                                Log.d("TEST", "DocumentSnapshot successfully written!")
+                                alertDialog.dismiss()
                             }
-                            .addOnFailureListener { e -> Log.w("TEST", "Error writing document", e) }
+                        }
+                            .addOnFailureListener { e -> Log.w("TEST", "Error writing document", e)
+                                alertDialog.dismiss()}
                     }
 
                 }
@@ -114,7 +114,20 @@ class ChatActivity : AppCompatActivity() {
     }
 
 
-
+    private fun makeDocumentCode():String
+    {
+        var verificationCode=""
+        val str = arrayOf("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
+            "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+            "1", "2", "3", "4", "5", "6", "7", "8", "9")
+        val range=(0..str.size-1)
+        for (x in 0..19) {
+            val random = range.random()
+            verificationCode += str[random]
+        }
+        return verificationCode
+    }
 
 
 }
+

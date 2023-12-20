@@ -39,6 +39,10 @@ class InitialActivity : AppCompatActivity() {
         auth = Firebase.auth
         if (auth.currentUser!=null)
         {
+            if (NaverIdLoginSDK.getState()==NidOAuthLoginState.OK)
+            {
+                NaverIdLoginSDK.logout()
+            }
             loginInformation.setCurrentLoginUserWithUID(auth.currentUser!!.uid, loginUser.email)
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)

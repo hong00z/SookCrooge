@@ -41,10 +41,11 @@ class ChatFragment2 : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val binding2 = FragmentChat2Binding.inflate(layoutInflater,container,false)
-        val userName="asd123@naver.com"
+        val userName=loginInformation.currentLoginUser!!.nickname.toString()
         val chatData = mutableListOf<Chat>()
-        db.collection("rooms")
-            .whereEqualTo("userName", userName)
+
+
+        db.collectionGroup("chatUsers")
             .addSnapshotListener { value, e ->
 
                 if (e != null) {
@@ -54,18 +55,33 @@ class ChatFragment2 : Fragment() {
                 for (dc in value!!.documentChanges) {
                     when (dc.type) {
                         DocumentChange.Type.ADDED -> {
-                            val currentData = Chat(
-                                dc.document.data["chatName"].toString(),
-                                dc.document.data["chatNum"].toString(),
-                                dc.document.data["userName"].toString(),
-                                dc.document.data["date"].toString()
-                            )
-                            currentData.addDocumentID(dc.document.data["documentID"].toString())
-                            chatData.add(currentData)
-                            val layoutManager = LinearLayoutManager(activity)
-                            binding2.recyclerChat2.layoutManager = layoutManager
-                            val adapter = ChatAdapter(chatData)
-                            binding2.recyclerChat2.adapter = adapter
+                            db.collection("rooms").document(dc.document.data["documentID"].toString()).get().addOnSuccessListener{
+                                if (dc.document.data["userName"].toString() == userName)
+                                {
+                                    Log.d("jhs", it.data.toString())
+                                    val currentData = Chat(
+                                        it.get("chatName").toString(),
+                                        it.get("chatNum").toString(),
+                                        it.get("userName").toString(),
+                                        it.get("date").toString())
+                                    currentData.addDocumentID(dc.document.data["documentID"].toString())
+                                    chatData.add(currentData)
+                                    val layoutManager = LinearLayoutManager(activity)
+                                    binding2.recyclerChat2.layoutManager = layoutManager
+                                    val adapter = ChatAdapter(chatData)
+                                    binding2.recyclerChat2.adapter = adapter
+
+                                    (binding2.recyclerChat2.adapter as ChatAdapter).setItemClickListener(object: ChatAdapter.OnItemClickListener{
+                                        override fun update(data: Chat){
+                                            chatData.remove(data)
+                                            binding2.recyclerChat2.adapter=ChatAdapter(chatData)
+                                            ChatAdapter(chatData).notifyDataSetChanged()
+                                        }
+                                    })
+                                }
+
+                            }
+
                         }
 
                         else -> {}

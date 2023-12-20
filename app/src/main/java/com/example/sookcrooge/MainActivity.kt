@@ -26,6 +26,7 @@ import com.example.sookcrooge.databinding.AccountListBinding
 import com.example.sookcrooge.databinding.ActivityMainBinding
 import com.example.sookcrooge.databinding.NavigationHeaderBinding
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
@@ -46,10 +47,12 @@ class MainActivity : AppCompatActivity() {
     lateinit var viewHeader: View
     lateinit var navViewHeaderBinding: NavigationHeaderBinding
     lateinit var userUID: String
+    private lateinit var auth: FirebaseAuth
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        auth=Firebase.auth
         binding.profile.setOnClickListener{
             val navDrawer = binding.drawer
             if(!navDrawer.isDrawerOpen(GravityCompat.START)) navDrawer.openDrawer(GravityCompat.START);
@@ -74,10 +77,8 @@ class MainActivity : AppCompatActivity() {
                 db.collection("users").document(document.id).collection("accountBook").whereGreaterThanOrEqualTo("date",firstDayOfMonth).get().addOnSuccessListener{
                     for (item in it)
                     {
-                        Log.d("jhs", document.data.toString())
                         if (item.data?.get("type").toString()=="spend" && item.data?.get("angry").toString().toInt() > maxAngry)
                         {
-                            Log.d("jhs", "소비: "+item.data.toString())
                             maxAngryName=document.data?.get("nickname").toString()
                             maxAngry=item.data?.get("angry").toString().toInt()
 
@@ -90,7 +91,6 @@ class MainActivity : AppCompatActivity() {
                         }
                         if (item.data?.get("type").toString()=="save" && item.data?.get("smile").toString().toInt() > maxSmile)
                         {
-                            Log.d("jhs", "절약: "+item.data.toString())
                             maxSmileName=document.data?.get("nickname").toString()
                             maxSmile=item.data?.get("smile").toString().toInt()
                             var timeStamp = item.data["date"] as Timestamp
@@ -150,6 +150,13 @@ class MainActivity : AppCompatActivity() {
         viewHeader = binding.mainDrawerView.getHeaderView(0)
         navViewHeaderBinding = NavigationHeaderBinding.bind(viewHeader)
 
+        val nicknameRequestLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()){
+            it.data!!.getStringExtra("nickname")?.let {
+                navViewHeaderBinding.nickname.text = it
+            }
+        }
+
         val requestLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode === android.app.Activity.RESULT_OK) {
                 Glide.with(getApplicationContext()).load(it.data?.data).apply(RequestOptions().override(200, 200))
@@ -182,14 +189,26 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        navViewHeaderBinding.changeProfile.setOnClickListener{
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.setDataAndType(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                "image/*"
-            )
-            requestLauncher.launch(intent)
+        val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission())
+        {isGranted->
+            if (isGranted)
+            {
+                val intent = Intent(Intent.ACTION_PICK)
+                intent.setDataAndType(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    "image/*"
+                )
+                requestLauncher.launch(intent)
+            }
+            else
+            {
+                Toast.makeText(this, "사진 및 동영상 권한을 설정해야 합니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
 
+
+        navViewHeaderBinding.changeProfile.setOnClickListener{
+            requestPermissionLauncher.launch("android.permission.READ_MEDIA_IMAGES")
         }
 
         binding.logout.setOnClickListener{
@@ -207,7 +226,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.editProfile.setOnClickListener{
             val intent = Intent(this, EditProfile::class.java)
-            startActivity(intent)
+            nicknameRequestLauncher.launch(intent)
         }
 
         binding.accountBook.setOnClickListener{
