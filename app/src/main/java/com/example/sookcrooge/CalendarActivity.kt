@@ -145,11 +145,11 @@ class CalendarActivity :AppCompatActivity() {
                         (binding.recyclerView.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
                             override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
                                 binding.smileText.text= (data.smile+1).toString()
-                                db.collection("users").document("cDHZ1eavHhLxULN3HiX3").collection("accountBook").document(data.documentID).update("smile", (data.smile+1))
+                                db.collection("users").document(loginInformation.currentLoginUser!!.uid).collection("accountBook").document(data.documentID).update("smile", (data.smile+1))
                             }
                             override fun onAngryClick(binding: AccountListBinding, data: accountItem) {
                                 binding.angryText.text= (data.angry+1).toString()
-                                db.collection("users").document("cDHZ1eavHhLxULN3HiX3").collection("accountBook").document(data.documentID).update("angry", (data.angry+1))
+                                db.collection("users").document(loginInformation.currentLoginUser!!.uid).collection("accountBook").document(data.documentID).update("angry", (data.angry+1))
                             }
                         })
 
@@ -181,11 +181,11 @@ class CalendarActivity :AppCompatActivity() {
                         (binding.recyclerView.adapter as OthersAccountAdapter).setItemClickListener(object: OthersAccountAdapter.OnItemClickListener{
                             override fun onSmileClick(binding: AccountListBinding, data: accountItem) {
                                 binding.smileText.text= (data.smile+1).toString()
-                                db.collection("users").document("cDHZ1eavHhLxULN3HiX3").collection("accountBook").document(data.documentID).update("smile", (data.smile+1))
+                                db.collection("users").document(loginInformation.currentLoginUser!!.uid).collection("accountBook").document(data.documentID).update("smile", (data.smile+1))
                             }
                             override fun onAngryClick(binding: AccountListBinding, data: accountItem) {
                                 binding.angryText.text= (data.angry+1).toString()
-                                db.collection("users").document("cDHZ1eavHhLxULN3HiX3").collection("accountBook").document(data.documentID).update("angry", (data.angry+1))
+                                db.collection("users").document(loginInformation.currentLoginUser!!.uid).collection("accountBook").document(data.documentID).update("angry", (data.angry+1))
                             }
                         })
                     }
