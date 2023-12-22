@@ -107,6 +107,7 @@ class ResetPassword : AppCompatActivity() {
             {
                 binding.resetPWDWarningNumber.visibility=View.VISIBLE
                 binding.resetPWDWarningNumber.text = "인증이 완료되지 않았습니다."
+                isAllQualified=false
             }
             if (isPasswordQualified())
             {
